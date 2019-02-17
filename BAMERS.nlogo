@@ -54,6 +54,7 @@ workers-own[
   propensity-to-consume-c
   my-stores
   my-large-store
+  extorter?
 ]
 
 banks-own[
@@ -165,6 +166,7 @@ to go
   firms-calculate-production
   labor-market
   credit-market
+  become-extortionists
   firms-produce
   goods-market
   firms-pay
@@ -367,6 +369,15 @@ to firing-step
   ]
 end
 
+;;;;;;;;;; to become-extortionists ;;;;;;;;;;
+to become-extortionists
+  ask workers with [not employed?][
+    if (random 100 <= propensity-to-be-extorter-epsilon)[
+      set extorter? true
+      set color red
+    ]
+  ]
+end
 ;;;;;;;;;; to firms-produce  ;;;;;;;;;;
 to firms-produce
   ask firms [
@@ -867,7 +878,7 @@ beta
 beta
 0.01
 1
-0.87
+0.84
 0.01
 1
 NIL
@@ -882,7 +893,7 @@ dividends-delta
 dividends-delta
 0
 0.5
-0.15
+0.12
 0.01
 1
 NIL
@@ -1352,6 +1363,31 @@ PENS
 "mean" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nset-plot-y-range max (list 0 ceiling ln-hopital min [patrimonial-base-E] of banks) max (list 1 (1 + ceiling ln-hopital max [patrimonial-base-E] of banks))\nplot ln-hopital mean [patrimonial-base-E] of banks"
 "max" 1.0 0 -2674135 true "" "plot ln-hopital max [patrimonial-base-E] of banks"
 "min" 1.0 0 -13345367 true "" "plot ln-hopital min [patrimonial-base-E] of banks"
+
+TEXTBOX
+270
+450
+420
+468
+Extortion parameters
+12
+0.0
+1
+
+SLIDER
+270
+470
+577
+503
+propensity-to-be-extorter-epsilon
+propensity-to-be-extorter-epsilon
+0
+100
+5.0
+1
+1
+%
+HORIZONTAL
 
 @#$#@#$#@
 Overview
