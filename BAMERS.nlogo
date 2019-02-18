@@ -55,6 +55,7 @@ workers-own[
   my-stores
   my-large-store
   extorter?
+  my-extorter-firms
 ]
 
 banks-own[
@@ -115,6 +116,8 @@ to initialize-variables
     set propensity-to-consume-c 1
     set my-stores no-turtles
     set my-large-store no-turtles
+    set extorter? false
+    set my-extorter-firms no-turtles
   ]
   ask banks [
     set total-amount-of-credit-C 0
@@ -232,7 +235,7 @@ end
 to labor-market-opens
   if (sum [number-of-vacancies-offered-V] of firms > 0) [
     let potential-firms firms with [number-of-vacancies-offered-V > 0]
-    ask workers with [not employed?][
+    ask workers with [not employed? and not extorter?][
       ifelse (not empty? [my-firm] of my-potential-firms)
       [set my-potential-firms (turtle-set my-firm n-of (labor-market-M - 1 ) potential-firms)]
       [set my-potential-firms n-of (min (list labor-market-M count potential-firms)) potential-firms]
@@ -255,7 +258,7 @@ end
 to hiring-step [trials]
   while [trials > 0]
   [
-    ask workers with [not employed? and any? my-potential-firms][
+    ask workers with [not employed? and any? my-potential-firms and not extorter?][
       move-to max-one-of my-potential-firms [wage-offered-Wb]
     ]
     ask firms with [number-of-vacancies-offered-V > 0 ][
@@ -371,12 +374,13 @@ end
 
 ;;;;;;;;;; to become-extortionists ;;;;;;;;;;
 to become-extortionists
-  ask workers with [not employed?][
+  ask workers with [not employed? and savings <= 0 ][
     if (random 100 <= propensity-to-be-extorter-epsilon)[
       set extorter? true
       set color red
     ]
   ]
+
 end
 ;;;;;;;;;; to firms-produce  ;;;;;;;;;;
 to firms-produce
@@ -1347,7 +1351,7 @@ PENS
 PLOT
 975
 505
-1240
+1245
 625
 Banks patrimonial base
 Quarter
@@ -1383,11 +1387,44 @@ propensity-to-be-extorter-epsilon
 propensity-to-be-extorter-epsilon
 0
 100
-5.0
+100.0
 1
 1
 %
 HORIZONTAL
+
+SLIDER
+270
+510
+477
+543
+firms-to-extort-X
+firms-to-extort-X
+1
+2
+1.0
+1
+1
+trials
+HORIZONTAL
+
+PLOT
+1245
+505
+1515
+625
+Extorters
+NIL
+NIL
+0.0
+1.0
+0.0
+1.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nplot count workers with [extorter?]"
 
 @#$#@#$#@
 Overview
