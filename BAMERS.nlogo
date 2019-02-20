@@ -55,7 +55,8 @@ workers-own[
   my-stores
   my-large-store
   extorter?
-  my-extorter-firms
+  firms-to-extort
+  firms-to-punish
 ]
 
 banks-own[
@@ -117,7 +118,8 @@ to initialize-variables
     set my-stores no-turtles
     set my-large-store no-turtles
     set extorter? false
-    set my-extorter-firms no-turtles
+    set firms-to-extort no-turtles
+    set firms-to-punish no-turtles
   ]
   ask banks [
     set total-amount-of-credit-C 0
@@ -169,7 +171,7 @@ to go
   firms-calculate-production
   labor-market
   credit-market
-  become-extortionists
+  extortion-search
   firms-produce
   goods-market
   firms-pay
@@ -372,7 +374,12 @@ to firing-step
   ]
 end
 
-;;;;;;;;;; to become-extortionists ;;;;;;;;;;
+;;;;;;;;;; to extortion-search ;;;;;;;;;;
+to extortion-search
+  become-extortionists
+  extorts
+end
+
 to become-extortionists
   let Q1 lower-quartile [savings] of workers
   ask workers with [not employed? and savings < Q1 ][
@@ -381,8 +388,21 @@ to become-extortionists
       set color red
     ]
   ]
-
 end
+
+to extorts
+  let trials firms-to-extort-X
+  while [trials > 0][
+    ask workers with [extorter?][
+      ifelse (random 100 > rejection-probability)
+      [set firms-to-extort (turtle-set firms-to-extort one-of firms)];; succesful extortion
+      [set firms-to-punish (turtle-set firms-to-punish one-of firms)];; firm refused to pay (rare event with lower rejection-probabilities)
+    ]
+
+    set trials trials - 1
+  ]
+end
+
 ;;;;;;;;;; to firms-produce  ;;;;;;;;;;
 to firms-produce
   ask firms [
@@ -1432,6 +1452,21 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nplot count workers with [extorter?]"
+
+SLIDER
+480
+510
+697
+543
+rejection-probability
+rejection-probability
+0
+100
+10.0
+1
+1
+%
+HORIZONTAL
 
 @#$#@#$#@
 Overview
