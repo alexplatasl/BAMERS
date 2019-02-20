@@ -374,7 +374,8 @@ end
 
 ;;;;;;;;;; to become-extortionists ;;;;;;;;;;
 to become-extortionists
-  ask workers with [not employed? and savings <= 0 ][
+  let Q1 lower-quartile [savings] of workers
+  ask workers with [not employed? and savings < Q1 ][
     if (random 100 <= propensity-to-be-extorter-epsilon)[
       set extorter? true
       set color red
@@ -575,6 +576,12 @@ end
 to-report fn-truncated-normal [ m sd ]
   let normal-value random-normal m sd
   report ifelse-value (normal-value > (m - sd)) [normal-value][max list 1 (m - sd)]
+end
+
+to-report lower-quartile [ xs ]
+  let med median xs
+  let lower filter [ x -> x < med ] xs
+  report ifelse-value (empty? lower) [ med ] [ median lower ]
 end
 
 ; observation
@@ -1386,8 +1393,8 @@ SLIDER
 propensity-to-be-extorter-epsilon
 propensity-to-be-extorter-epsilon
 0
-100
-100.0
+20
+2.0
 1
 1
 %
