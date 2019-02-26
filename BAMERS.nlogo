@@ -40,6 +40,8 @@ firms-own[
   ; for visual representation
   x-position
   y-position
+  ; extortion variables
+  being-extorted?
 ]
 
 workers-own[
@@ -105,6 +107,7 @@ to initialize-variables
     set individual-price-P base-price
     set revenue-R 0
     set retained-profits-pi 0
+    set being-extorted? false
   ]
   ask workers [
     set employed? false
@@ -394,9 +397,14 @@ to extorts
   let trials firms-to-extort-X
   while [trials > 0][
     ask workers with [extorter?][
-      ifelse (random 100 > rejection-probability)
-      [set firms-to-extort (turtle-set firms-to-extort one-of firms)];; succesful extortion
-      [set firms-to-punish (turtle-set firms-to-punish one-of firms)];; firm refused to pay (rare event with lower rejection-probabilities)
+      ; extorter/worker goes randomly to a company (not already extorted) to extort
+      let potential-firm-to-extort one-of firms with [not member? self firms-to-extort]
+      ; if the randomly selected company has already been extorted by someone else who provides "protection", the worker loses his chance to extort
+      if ([not being-extorted?] of potential-firm-to-extort)[
+        ifelse (random 100 > rejection-probability)
+        [set firms-to-extort (turtle-set potential-firm-to-extort)]; succesful extortion
+        [set firms-to-punish (turtle-set potential-firm-to-extort)]; firm refused to pay (rare event with lower rejection-probabilities)
+      ]
     ]
 
     set trials trials - 1
@@ -1414,7 +1422,7 @@ propensity-to-be-extorter-epsilon
 propensity-to-be-extorter-epsilon
 0
 20
-2.0
+0.0
 1
 1
 %
