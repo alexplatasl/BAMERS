@@ -42,6 +42,7 @@ firms-own[
   y-position
   ; extortion variables
   being-extorted?
+  ammount-of-pizzo
 ]
 
 workers-own[
@@ -174,9 +175,9 @@ to go
   firms-calculate-production
   labor-market
   credit-market
-  extortion-search
   firms-produce
   goods-market
+  extortion
   firms-pay
   firms-banks-survive
   replace-bankrupt
@@ -377,40 +378,6 @@ to firing-step
   ]
 end
 
-;;;;;;;;;; to extortion-search ;;;;;;;;;;
-to extortion-search
-  become-extortionists
-  extorts
-end
-
-to become-extortionists
-  let Q1 lower-quartile [savings] of workers
-  ask workers with [not employed? and savings < Q1 ][
-    if (random 100 < propensity-to-be-extorter-epsilon)[
-      set extorter? true
-      set color red
-    ]
-  ]
-end
-
-to extorts
-  let trials firms-to-extort-X
-  while [trials > 0][
-    ask workers with [extorter?][
-      ; extorter/worker goes randomly to a company (not already extorted) to extort
-      let potential-firm-to-extort one-of firms with [not member? self firms-to-extort]
-      ; if the randomly selected company has already been extorted by someone else who provides "protection", the worker loses his chance to extort
-      if ([not being-extorted?] of potential-firm-to-extort)[
-        ifelse (random 100 > rejection-probability)
-        [set firms-to-extort (turtle-set potential-firm-to-extort)]; succesful extortion
-        [set firms-to-punish (turtle-set potential-firm-to-extort)]; firm refused to pay (rare event with lower rejection-probabilities)
-      ]
-    ]
-
-    set trials trials - 1
-  ]
-end
-
 ;;;;;;;;;; to firms-produce  ;;;;;;;;;;
 to firms-produce
   ask firms [
@@ -478,6 +445,51 @@ to buying-step [trials money]; workers procedure
     set savings savings + money
   ]
 end
+
+;;;;;;;;;; to extortion ;;;;;;;;;;
+to extortion
+  become-extortionists
+  extortion-search
+  execute-extortion
+end
+
+to become-extortionists
+  let Q1 lower-quartile [savings] of workers
+  ask workers with [not employed? and savings < Q1 ][
+    if (random 100 < propensity-to-be-extorter-epsilon)[
+      set extorter? true
+      set color red
+    ]
+  ]
+end
+
+to extortion-search
+  let trials firms-to-extort-X
+  while [trials > 0][
+    ask workers with [extorter?][
+      ; extorter/worker goes randomly to a company (not already extorted) to extort
+      let potential-firm-to-extort one-of firms with [not member? self firms-to-extort]
+      ; if the randomly selected company has already been extorted by someone else who provides "protection", the worker loses his chance to extort
+      if ([not being-extorted?] of potential-firm-to-extort)[
+        ifelse (random 100 > rejection-probability)
+        [set firms-to-extort (turtle-set potential-firm-to-extort)]; succesful extortion
+        [set firms-to-punish (turtle-set potential-firm-to-extort)]; firm refused to pay (rare event with lower rejection-probabilities)
+      ]
+    ]
+    set trials trials - 1
+  ]
+end
+
+to execute-extortion
+  ask workers with [any? firms-to-extort][
+    ask firms-to-extort [
+      set ammount-of-pizzo net-worth-A * (100 - proportion-of-pizzo)
+      set net-worth-A net-worth-A - ammount-of-pizzo
+    ]
+    set income sum [ammount-of-pizzo] of firms-to-extort
+  ]
+end
+
 ;;;;;;;;;; to firms-pay  ;;;;;;;;;;
 to firms-pay
   ask firms [
@@ -1468,6 +1480,21 @@ SLIDER
 543
 rejection-probability
 rejection-probability
+0
+100
+10.0
+1
+1
+%
+HORIZONTAL
+
+SLIDER
+270
+545
+475
+578
+proportion-of-pizzo
+proportion-of-pizzo
 0
 100
 10.0
