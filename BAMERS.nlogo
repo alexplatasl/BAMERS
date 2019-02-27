@@ -487,7 +487,7 @@ end
 to execute-extortion
   ask workers with [any? firms-to-extort][
     ask firms-to-extort [
-      set amount-of-pizzo net-worth-A * (100 - proportion-of-pizzo)
+      set amount-of-pizzo max (list 0 (net-worth-A * (100 - proportion-of-pizzo)))
       set net-worth-A net-worth-A - amount-of-pizzo
     ]
     set income sum [amount-of-pizzo] of firms-to-extort
@@ -951,7 +951,7 @@ dividends-delta
 dividends-delta
 0
 0.5
-0.12
+0.15
 0.01
 1
 NIL
@@ -1467,7 +1467,7 @@ PLOT
 505
 1515
 625
-Extorters
+Extorters / Extorted
 NIL
 NIL
 0.0
@@ -1475,10 +1475,11 @@ NIL
 0.0
 1.0
 true
-false
+true
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nplot count workers with [extorter?]"
+"Extorters" 1.0 0 -5298144 true "" "set-plot-x-range 0 (ticks + 5)\nplot count workers with [extorter?]"
+"Extorted" 1.0 0 -14070903 true "" "plot count firms with [being-extorted?]"
 
 SLIDER
 480
@@ -1509,6 +1510,24 @@ proportion-of-pizzo
 1
 %
 HORIZONTAL
+
+PLOT
+1515
+505
+1775
+625
+Extortion value (sum of pizzo)
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot sum [amount-of-pizzo] of firms"
 
 @#$#@#$#@
 Overview
