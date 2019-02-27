@@ -42,7 +42,7 @@ firms-own[
   y-position
   ; extortion variables
   being-extorted?
-  ammount-of-pizzo
+  amount-of-pizzo
 ]
 
 workers-own[
@@ -467,12 +467,16 @@ to extortion-search
   let trials firms-to-extort-X
   while [trials > 0][
     ask workers with [extorter?][
-      ; extorter/worker goes randomly to a company (not already extorted) to extort
-      let potential-firm-to-extort one-of firms with [not member? self firms-to-extort]
+      ; extorter/worker goes randomly to a company (not already extorted by himself) to extort
+      let my-extorted-firms firms-to-extort
+      let potential-firm-to-extort one-of firms with [not member? self my-extorted-firms]
       ; if the randomly selected company has already been extorted by someone else who provides "protection", the worker loses his chance to extort
       if ([not being-extorted?] of potential-firm-to-extort)[
         ifelse (random 100 > rejection-probability)
-        [set firms-to-extort (turtle-set potential-firm-to-extort)]; succesful extortion
+        [
+          set firms-to-extort (turtle-set potential-firm-to-extort); succesful extortion
+          ask potential-firm-to-extort [ set being-extorted? true]
+        ]
         [set firms-to-punish (turtle-set potential-firm-to-extort)]; firm refused to pay (rare event with lower rejection-probabilities)
       ]
     ]
@@ -483,10 +487,10 @@ end
 to execute-extortion
   ask workers with [any? firms-to-extort][
     ask firms-to-extort [
-      set ammount-of-pizzo net-worth-A * (100 - proportion-of-pizzo)
-      set net-worth-A net-worth-A - ammount-of-pizzo
+      set amount-of-pizzo net-worth-A * (100 - proportion-of-pizzo)
+      set net-worth-A net-worth-A - amount-of-pizzo
     ]
-    set income sum [ammount-of-pizzo] of firms-to-extort
+    set income sum [amount-of-pizzo] of firms-to-extort
   ]
 end
 
@@ -569,6 +573,9 @@ to replace-bankrupt
       set my-bank no-turtles
       set inventory-S 0
       set individual-price-P  1.26 * average-market-price
+      ;-----------------
+      set being-extorted? false
+      set amount-of-pizzo 0
     ]
   ]
 
@@ -1434,7 +1441,7 @@ propensity-to-be-extorter-epsilon
 propensity-to-be-extorter-epsilon
 0
 20
-0.0
+1.0
 1
 1
 %
