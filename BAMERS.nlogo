@@ -1381,6 +1381,7 @@ PENS
 "default" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nset-plot-y-range 0 max (list 1 ceiling ln-hopital max [wealth] of workers)\nplot ln-hopital mean [wealth] of workers"
 "max" 1.0 0 -13840069 true "" "plot ln-hopital max [wealth] of workers"
 "min" 1.0 0 -2674135 true "" "plot ln-hopital round min [wealth] of workers"
+"pen-3" 1.0 0 -955883 true "" "plot ln-hopital mean [wealth] of workers with [extorter?]"
 
 PLOT
 710
@@ -1505,7 +1506,7 @@ proportion-of-pizzo
 proportion-of-pizzo
 0
 100
-10.0
+1.0
 1
 1
 %
