@@ -9,6 +9,7 @@ breed[banks bank]          ; the banks, max of credit-market-h + 1 and number of
 globals [
   quarters-average-price   ; an array storing the average price for the last 4 quarters.
   quarters-inflation       ; an array storing the inflation for the last 4 quarters.
+  confiscated-money
 ]
 
 firms-own[
@@ -60,6 +61,7 @@ workers-own[
   extorter?
   firms-to-extort
   firms-to-punish
+  time-in-jail
 ]
 
 banks-own[
@@ -451,6 +453,7 @@ to extortion
   become-extortionists
   extortion-search
   execute-extortion
+  jail-or-punishment
 end
 
 to become-extortionists
@@ -491,6 +494,29 @@ to execute-extortion
       set net-worth-A net-worth-A - amount-of-pizzo
     ]
     set income sum [amount-of-pizzo] of firms-to-extort
+  ]
+end
+
+to jail-or-punishment
+  ; The companies that refused to pay pizzo, call the police, and with a probability of being caught, extortionists are imprisoned
+  set confiscated-money 0; reset confiscated money each tick
+  let needy-shops (turtle-set [firms-to-punish] of workers with [any? firms-to-punish])
+  ask workers with [any? firms-to-punish][
+    ; greater the number of extorted companies, greater the probability of being imprisoned
+    ifelse (random 100 < (probability-of-being-caught * count firms-to-punish)) [
+      ; extortionists are imprisoned
+      set extorter? false
+      set color yellow
+      set firms-to-extort no-turtles
+      set firms-to-punish no-turtles
+      set confiscated-money confiscated-money + wealth
+      set wealth 0
+    ][
+      show (word "Punishment!")
+    ]
+  ]
+  ask needy-shops [
+    set net-worth-A net-worth-A + ( confiscated-money / count needy-shops )
   ]
 end
 
@@ -936,7 +962,7 @@ beta
 beta
 0.01
 1
-0.84
+0.87
 0.01
 1
 NIL
@@ -1083,19 +1109,18 @@ PLOT
 256
 974
 376
-Ln nominal - real GDP
+Ln real GDP
 Quater
 NIL
 0.0
 10.0
 0.0
-10.0
+3.0
 true
-true
+false
 "" ""
 PENS
-"Nom." 1.0 2 -12030287 true "" "set-plot-x-range 0 (ticks + 5)\nplot-nominal-GDP"
-"Real" 1.0 0 -8053223 true "" "plot-real-GDP"
+"Nom." 1.0 2 -12030287 true "" "set-plot-x-range 0 (ticks + 5)\nplot-real-GDP"
 
 PLOT
 977
@@ -1134,26 +1159,6 @@ PENS
 "mean" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nplot ln average-market-price"
 "min" 1.0 2 -2674135 true "" "set-plot-x-range 0 (ticks + 5)\nplot ln min [individual-price-P] of firms"
 "max" 1.0 0 -13345367 true "" "set-plot-x-range 0 (ticks + 5)\nplot ln max [individual-price-P] of firms"
-
-PLOT
-708
-379
-974
-499
-wage-offered-Wb
-Quarter
-NIL
-0.0
-10.0
-0.0
-1.0
-true
-true
-"" ""
-PENS
-"mean" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nplot ln mean [wage-offered-Wb] of firms"
-"min" 1.0 0 -2674135 true "" "plot ln min [wage-offered-Wb] of firms"
-"max" 1.0 0 -13345367 true "" "plot ln max [wage-offered-Wb] of firms"
 
 TEXTBOX
 216
@@ -1414,12 +1419,12 @@ Ln
 0.0
 10.0
 0.0
-10.0
+9.0
 true
 true
 "" ""
 PENS
-"mean" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nset-plot-y-range max (list 0 ceiling ln-hopital min [patrimonial-base-E] of banks) max (list 1 (1 + ceiling ln-hopital max [patrimonial-base-E] of banks))\nplot ln-hopital mean [patrimonial-base-E] of banks"
+"mean" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nset-plot-y-range 9 max (list 1 (1 + ceiling ln-hopital max [patrimonial-base-E] of banks))\nplot ln-hopital mean [patrimonial-base-E] of banks"
 "max" 1.0 0 -2674135 true "" "plot ln-hopital max [patrimonial-base-E] of banks"
 "min" 1.0 0 -13345367 true "" "plot ln-hopital min [patrimonial-base-E] of banks"
 
@@ -1451,7 +1456,7 @@ HORIZONTAL
 SLIDER
 270
 510
-477
+480
 543
 firms-to-extort-X
 firms-to-extort-X
@@ -1485,7 +1490,7 @@ PENS
 SLIDER
 480
 510
-697
+705
 543
 rejection-probability
 rejection-probability
@@ -1500,7 +1505,7 @@ HORIZONTAL
 SLIDER
 270
 545
-475
+480
 578
 proportion-of-pizzo
 proportion-of-pizzo
@@ -1529,6 +1534,41 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plot sum [amount-of-pizzo] of firms"
+
+SLIDER
+480
+545
+705
+578
+probability-of-being-caught
+probability-of-being-caught
+0
+50
+10.0
+1
+1
+%
+HORIZONTAL
+
+PLOT
+709
+379
+974
+499
+wage-offered-Wb
+Quarter
+NIL
+0.0
+10.0
+0.0
+1.0
+true
+true
+"" ""
+PENS
+"mean" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nplot ln mean [wage-offered-Wb] of firms"
+"min" 1.0 0 -2674135 true "" "plot ln min [wage-offered-Wb] of firms"
+"max" 1.0 0 -13345367 true "" "plot ln max [wage-offered-Wb] of firms"
 
 @#$#@#$#@
 Overview
