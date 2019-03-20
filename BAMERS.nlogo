@@ -44,6 +44,7 @@ firms-own[
   ; extortion variables
   being-extorted?
   amount-of-pizzo
+  amount-of-punish
 ]
 
 workers-own[
@@ -490,10 +491,10 @@ end
 to execute-extortion
   ask workers with [any? firms-to-extort][
     ask firms-to-extort [
-      set amount-of-pizzo max (list 0 (net-worth-A * (100 - proportion-of-pizzo)))
+      set amount-of-pizzo max (list 0 (net-worth-A * (proportion-of-pizzo / 100)))
       set net-worth-A net-worth-A - amount-of-pizzo
     ]
-    set income sum [amount-of-pizzo] of firms-to-extort
+    set wealth sum [amount-of-pizzo] of firms-to-extort
   ]
 end
 
@@ -512,7 +513,13 @@ to jail-or-punishment
       set confiscated-money confiscated-money + wealth
       set wealth 0
     ][
-      show (word "Punishment!")
+      ; Extorters punish firms!
+      ask firms-to-punish [
+        ; amount of punish is three times greater than amount of the pizzo
+        set amount-of-punish max (list 0 (net-worth-A * ((proportion-of-pizzo * 3) / 100)))
+        set net-worth-A net-worth-A - amount-of-punish
+      ]
+      set wealth sum [amount-of-punish] of firms-to-punish
     ]
   ]
   ask needy-shops [
@@ -1360,12 +1367,10 @@ Quaters
 0.0
 10.0
 true
-true
+false
 "" ""
 PENS
 "mean" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nplot 100 * mean [my-interest-rate] of firms"
-"max" 1.0 0 -2674135 true "" "plot 100 * max [my-interest-rate] of firms"
-"min" 1.0 0 -13345367 true "" "plot 100 * min [my-interest-rate] of firms"
 
 PLOT
 1516
@@ -1383,10 +1388,8 @@ true
 true
 "" ""
 PENS
-"mean" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nset-plot-y-range 0 max (list 1 ceiling ln-hopital max [wealth] of workers)\nplot ln-hopital mean [wealth] of workers with [not extorter?]"
-"max" 1.0 0 -13840069 true "" "plot ln-hopital max [wealth] of workers with [not extorter?]"
-"min" 1.0 0 -2674135 true "" "plot ln-hopital round min [wealth] of workers with [not extorter?]"
-"extorter" 1.0 0 -955883 true "" "plot ln-hopital mean [wealth] of workers with [extorter?]"
+"regular" 1.0 0 -14439633 true "" "set-plot-x-range 0 (ticks + 5)\nset-plot-y-range 0 max (list 1 ceiling ln-hopital max [wealth] of workers)\nplot ln-hopital mean [wealth] of workers with [not extorter?]"
+"extorter" 1.0 0 -5298144 true "" "plot ln-hopital mean [wealth] of workers with [extorter?]"
 
 PLOT
 710
@@ -1455,9 +1458,9 @@ HORIZONTAL
 
 SLIDER
 270
-510
-480
-543
+505
+445
+538
 firms-to-extort-X
 firms-to-extort-X
 1
@@ -1473,7 +1476,7 @@ PLOT
 505
 1515
 625
-Extorters / Extorted
+Extorters & Extorted
 NIL
 NIL
 0.0
@@ -1489,9 +1492,9 @@ PENS
 
 SLIDER
 480
-510
+505
 705
-543
+538
 rejection-probability
 rejection-probability
 0
@@ -1504,9 +1507,9 @@ HORIZONTAL
 
 SLIDER
 270
-545
-480
-578
+540
+445
+573
 proportion-of-pizzo
 proportion-of-pizzo
 0
@@ -1522,24 +1525,25 @@ PLOT
 505
 1775
 625
-Extortion value (sum of pizzo)
+Sum of pizzo & punish
 NIL
 NIL
 0.0
-10.0
+4.0
 0.0
-10.0
+4.0
 true
-false
+true
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot sum [amount-of-pizzo] of firms"
+"pizzo" 1.0 0 -5825686 true "" "set-plot-x-range 0 (ticks + 5)\nplot sum [amount-of-pizzo] of firms"
+"punish" 1.0 0 -5298144 true "" "plot sum [amount-of-punish] of firms"
 
 SLIDER
 480
-545
+540
 705
-578
+573
 probability-of-being-caught
 probability-of-being-caught
 0
@@ -1569,6 +1573,66 @@ PENS
 "mean" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nplot ln mean [wage-offered-Wb] of firms"
 "min" 1.0 0 -2674135 true "" "plot ln min [wage-offered-Wb] of firms"
 "max" 1.0 0 -13345367 true "" "plot ln max [wage-offered-Wb] of firms"
+
+TEXTBOX
+585
+480
+615
+498
+1%
+12
+5.0
+1
+
+TEXTBOX
+215
+480
+260
+498
+0.20
+12
+5.0
+1
+
+TEXTBOX
+215
+515
+265
+533
+1 trial
+12
+5.0
+1
+
+TEXTBOX
+215
+550
+260
+568
+1%
+12
+5.0
+1
+
+TEXTBOX
+450
+515
+480
+533
+10%
+12
+5.0
+1
+
+TEXTBOX
+450
+550
+480
+568
+10%
+12
+5.0
+1
 
 @#$#@#$#@
 Overview
