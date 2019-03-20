@@ -10,6 +10,8 @@ globals [
   quarters-average-price   ; an array storing the average price for the last 4 quarters.
   quarters-inflation       ; an array storing the inflation for the last 4 quarters.
   confiscated-money
+  gini-index-reserve
+  lorenz-points
 ]
 
 firms-own[
@@ -185,6 +187,7 @@ to go
   firms-banks-survive
   replace-bankrupt
 
+  update-lorenz-and-gini
   tick
 end
 
@@ -732,6 +735,33 @@ to-report base-savings
   report 2
 end
 
+;; this procedure recomputes the value of gini-index-reserve
+;; and the points in lorenz-points for the Lorenz and Gini-Index plots
+;; Code adapted from:
+;; Wilensky, U. (1998). NetLogo Wealth Distribution model.
+;; http://ccl.northwestern.edu/netlogo/models/WealthDistribution.
+;; Center for Connected Learning and Computer-Based Modeling,
+;; Northwestern University, Evanston, IL.
+to update-lorenz-and-gini
+  let sorted-wealths sort [wealth] of workers
+  let total-wealth sum sorted-wealths
+  let wealth-sum-so-far 0
+  let index 0
+  let number-of-workers round (number-of-firms * 5)
+  set gini-index-reserve 0
+  set lorenz-points []
+
+  repeat number-of-workers [
+    set wealth-sum-so-far (wealth-sum-so-far + item index sorted-wealths)
+    set lorenz-points lput ((wealth-sum-so-far / total-wealth) * 100) lorenz-points
+    set index (index + 1)
+    set gini-index-reserve
+      gini-index-reserve +
+      (index / number-of-workers) -
+      (wealth-sum-so-far / total-wealth)
+  ]
+end
+
 to-report average-real-interest-rate
 
 end
@@ -812,10 +842,10 @@ SLIDER
 81
 number-of-firms
 number-of-firms
-2
-1000
+10
+500
 100.0
-2
+10
 1
 NIL
 HORIZONTAL
@@ -1514,7 +1544,7 @@ proportion-of-pizzo
 proportion-of-pizzo
 0
 100
-1.0
+10.0
 1
 1
 %
@@ -1536,7 +1566,7 @@ true
 true
 "" ""
 PENS
-"pizzo" 1.0 0 -5825686 true "" "set-plot-x-range 0 (ticks + 5)\nplot sum [amount-of-pizzo] of firms"
+"pizzo" 1.0 0 -13345367 true "" "set-plot-x-range 0 (ticks + 5)\nplot sum [amount-of-pizzo] of firms"
 "punish" 1.0 0 -5298144 true "" "plot sum [amount-of-punish] of firms"
 
 SLIDER
@@ -1609,7 +1639,7 @@ TEXTBOX
 550
 260
 568
-1%
+10%
 12
 5.0
 1
@@ -1633,6 +1663,43 @@ TEXTBOX
 12
 5.0
 1
+
+PLOT
+710
+630
+975
+750
+Lorenz curve of workers
+Pop %
+Wealth %
+0.0
+95.0
+0.0
+100.0
+true
+true
+"" ""
+PENS
+"Lorenz" 1.0 0 -2674135 true "" "plot-pen-reset\nset-plot-x-range 0 100\nset-plot-pen-interval 100 / round (number-of-firms * 5)\nplot 0\nforeach lorenz-points plot"
+"Equal" 100.0 0 -13840069 true "plot 0\nplot 100" ""
+
+PLOT
+975
+630
+1245
+750
+Gini index
+Quarter
+Gini
+0.0
+10.0
+0.0
+1.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nplot (gini-index-reserve / round (number-of-firms * 5)) / 0.5"
 
 @#$#@#$#@
 Overview
