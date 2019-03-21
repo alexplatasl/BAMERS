@@ -762,6 +762,21 @@ to update-lorenz-and-gini
   ]
 end
 
+; b_1 skewness is calculated following:
+; Joanes, D.N. and Gill, C.A. (1998). Comparing measures of sample skewness and kurtosis.
+; The Statistician, 47, 183–189.
+to-report skewness-of-wealth
+  let wealths [wealth] of workers
+  let n round (number-of-firms * 5)
+  let x-bar mean wealths
+
+  let first-part ((n - 1 ) / n)^ (3 / 2)
+  let m-3-part ( reduce + map [i -> ( i - x-bar ) ^ 3] wealths ) / n
+  let m-2-part ( reduce + map [i -> ( i - x-bar ) ^ 2] wealths ) / n
+
+  report  first-part * (m-3-part / (m-2-part) ^ (3 / 2 ))
+end
+
 to-report average-real-interest-rate
 
 end
@@ -1479,9 +1494,9 @@ SLIDER
 propensity-to-be-extorter-epsilon
 propensity-to-be-extorter-epsilon
 0
-20
-1.0
-1
+100
+5.0
+5
 1
 %
 HORIZONTAL
@@ -1577,9 +1592,9 @@ SLIDER
 probability-of-being-caught
 probability-of-being-caught
 0
-50
+100
 10.0
-1
+5
 1
 %
 HORIZONTAL
@@ -2386,10 +2401,30 @@ NetLogo 6.0.4
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="stylized-facts" repetitions="100" runMetricsEveryStep="false">
+  <experiment name="exploration" repetitions="100" runMetricsEveryStep="false">
     <setup>setup</setup>
     <go>go</go>
-    <metric>[net-worth-A] of fn-incumbent-firms</metric>
+    <metric>unemployment-rate</metric>
+    <metric>mean [wealth] of workers</metric>
+    <metric>(gini-index-reserve / round (number-of-firms * 5)) / 0.5</metric>
+    <metric>skewness-of-wealth</metric>
+    <metric>count workers with [extorter?]</metric>
+    <metric>count firms with [being-extorted?]</metric>
+    <metric>sum [amount-of-pizzo] of firms</metric>
+    <metric>sum [amount-of-punish] of firms</metric>
+    <metric>mean [net-worth-A] of fn-incumbent-firms</metric>
+    <metric>mean [production-Y] of fn-incumbent-firms</metric>
+    <metric>mean [propensity-to-consume-c] of workers</metric>
+    <metric>quarterly-inflation</metric>
+    <metric>if (ticks &gt; 0 and ticks mod 4 = 0 )[(annualized-inflation - 1) * 100]</metric>
+    <metric>real-GDP</metric>
+    <metric>logarithm-of-households-consumption</metric>
+    <metric>ln average-market-price</metric>
+    <metric>100 * mean [my-interest-rate] of firms</metric>
+    <metric>ln mean [wage-offered-Wb] of firms</metric>
+    <metric>ln-hopital mean [inventory-S] of firms</metric>
+    <metric>ln-hopital mean [patrimonial-base-E] of banks</metric>
+    <steppedValueSet variable="propensity-to-be-extorter-epsilon" first="0" step="5" last="100"/>
   </experiment>
 </experiments>
 @#$#@#$#@
