@@ -1495,7 +1495,7 @@ propensity-to-be-extorter-epsilon
 propensity-to-be-extorter-epsilon
 0
 100
-5.0
+100.0
 5
 1
 %
@@ -2401,10 +2401,10 @@ NetLogo 6.0.4
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="exploration" repetitions="100" runMetricsEveryStep="false">
+  <experiment name="exploration" repetitions="100" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
-    <metric>unemployment-rate</metric>
+    <metric>fn-unemployment-rate</metric>
     <metric>mean [wealth] of workers</metric>
     <metric>(gini-index-reserve / round (number-of-firms * 5)) / 0.5</metric>
     <metric>skewness-of-wealth</metric>
@@ -2416,7 +2416,7 @@ NetLogo 6.0.4
     <metric>mean [production-Y] of fn-incumbent-firms</metric>
     <metric>mean [propensity-to-consume-c] of workers</metric>
     <metric>quarterly-inflation</metric>
-    <metric>if (ticks &gt; 0 and ticks mod 4 = 0 )[(annualized-inflation - 1) * 100]</metric>
+    <metric>(annualized-inflation - 1) * 100</metric>
     <metric>real-GDP</metric>
     <metric>logarithm-of-households-consumption</metric>
     <metric>ln average-market-price</metric>
