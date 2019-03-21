@@ -766,15 +766,19 @@ end
 ; Joanes, D.N. and Gill, C.A. (1998). Comparing measures of sample skewness and kurtosis.
 ; The Statistician, 47, 183–189.
 to-report skewness-of-wealth
-  let wealths [wealth] of workers
-  let n round (number-of-firms * 5)
-  let x-bar mean wealths
+  ifelse (ticks > 0)[
+    let wealths [wealth] of workers
+    let n round (number-of-firms * 5)
+    let x-bar mean wealths
 
-  let first-part ((n - 1 ) / n)^ (3 / 2)
-  let m-3-part ( reduce + map [i -> ( i - x-bar ) ^ 3] wealths ) / n
-  let m-2-part ( reduce + map [i -> ( i - x-bar ) ^ 2] wealths ) / n
+    let first-part ((n - 1 ) / n)^ (3 / 2)
+    let m-3-part ( reduce + map [i -> ( i - x-bar ) ^ 3] wealths ) / n
+    let m-2-part ( reduce + map [i -> ( i - x-bar ) ^ 2] wealths ) / n
 
-  report  first-part * (m-3-part / (m-2-part) ^ (3 / 2 ))
+    report  first-part * (m-3-part / (m-2-part) ^ (3 / 2 ))
+  ][
+    report 0
+  ]
 end
 
 to-report average-real-interest-rate
@@ -1495,7 +1499,7 @@ propensity-to-be-extorter-epsilon
 propensity-to-be-extorter-epsilon
 0
 100
-100.0
+0.0
 5
 1
 %
