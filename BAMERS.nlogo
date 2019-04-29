@@ -129,6 +129,7 @@ to initialize-variables
     set extorter? false
     set firms-to-extort no-turtles
     set firms-to-punish no-turtles
+    set time-in-jail 0
   ]
   ask banks [
     set total-amount-of-credit-C 0
@@ -458,6 +459,7 @@ to extortion
   extortion-search
   execute-extortion
   jail-or-punishment
+  in-jail
 end
 
 to become-extortionists
@@ -509,11 +511,10 @@ to jail-or-punishment
     ; greater the number of extorted companies, greater the probability of being imprisoned
     ifelse (random 100 < (probability-of-being-caught * count firms-to-punish)) [
       ; extortionists are imprisoned
-      set extorter? false
-      set color yellow
+      set time-in-jail 6
       set firms-to-extort no-turtles
       set firms-to-punish no-turtles
-      set confiscated-money confiscated-money + wealth
+      set confiscated-money confiscated-money + (wealth * (percent-transfer-fondo / 100))
       set wealth 0
     ][
       ; Extorters punish firms!
@@ -527,6 +528,16 @@ to jail-or-punishment
   ]
   ask needy-shops [
     set net-worth-A net-worth-A + ( confiscated-money / count needy-shops )
+  ]
+end
+
+to in-jail
+  ask workers with [time-in-jail > 0][
+    set time-in-jail time-in-jail - 1
+  ]
+  ask workers with [time-in-jail < 1 and extorter?][
+    set extorter? false
+    set color yellow
   ]
 end
 
@@ -1483,9 +1494,9 @@ PENS
 TEXTBOX
 270
 450
-420
-468
-Extortion parameters
+690
+476
+General extortion parameters
 12
 0.0
 1
@@ -1499,7 +1510,7 @@ propensity-to-be-extorter-epsilon
 propensity-to-be-extorter-epsilon
 0
 100
-0.0
+10.0
 5
 1
 %
@@ -1508,7 +1519,7 @@ HORIZONTAL
 SLIDER
 270
 505
-445
+575
 538
 firms-to-extort-X
 firms-to-extort-X
@@ -1540,10 +1551,10 @@ PENS
 "Extorted" 1.0 0 -14070903 true "" "plot count firms with [being-extorted?]"
 
 SLIDER
-480
-505
-705
-538
+270
+540
+575
+573
 rejection-probability
 rejection-probability
 0
@@ -1556,9 +1567,9 @@ HORIZONTAL
 
 SLIDER
 270
-540
-445
-573
+690
+495
+723
 proportion-of-pizzo
 proportion-of-pizzo
 0
@@ -1589,10 +1600,10 @@ PENS
 "punish" 1.0 0 -5298144 true "" "plot sum [amount-of-punish] of firms"
 
 SLIDER
-480
-540
-705
-573
+270
+575
+575
+608
 probability-of-being-caught
 probability-of-being-caught
 0
@@ -1625,9 +1636,9 @@ PENS
 
 TEXTBOX
 585
-480
+485
 615
-498
+503
 1%
 12
 5.0
@@ -1635,49 +1646,49 @@ TEXTBOX
 
 TEXTBOX
 215
-480
+485
 260
-498
+503
 0.20
 12
 5.0
 1
 
 TEXTBOX
-215
-515
-265
-533
+585
+520
+635
+538
 1 trial
 12
 5.0
 1
 
 TEXTBOX
-215
-550
-260
-568
+585
+705
+630
+723
 10%
 12
 5.0
 1
 
 TEXTBOX
-450
-515
-480
-533
+585
+555
+615
+573
 10%
 12
 5.0
 1
 
 TEXTBOX
-450
-550
-480
-568
+585
+590
+615
+608
 10%
 12
 5.0
@@ -1719,6 +1730,41 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nplot (gini-index-reserve / round (number-of-firms * 5)) / 0.5"
+
+TEXTBOX
+285
+670
+555
+688
+Pizzo payment parameters
+12
+5.0
+1
+
+SLIDER
+270
+610
+575
+643
+percent-transfer-fondo
+percent-transfer-fondo
+0
+100
+100.0
+50
+1
+%
+HORIZONTAL
+
+TEXTBOX
+585
+625
+625
+643
+100%
+12
+5.0
+1
 
 @#$#@#$#@
 Overview
@@ -2428,7 +2474,7 @@ NetLogo 6.0.4
     <metric>ln mean [wage-offered-Wb] of firms</metric>
     <metric>ln-hopital mean [inventory-S] of firms</metric>
     <metric>ln-hopital mean [patrimonial-base-E] of banks</metric>
-    <steppedValueSet variable="propensity-to-be-extorter-epsilon" first="0" step="5" last="100"/>
+    <steppedValueSet variable="probability-of-being-caught" first="5" step="5" last="100"/>
   </experiment>
 </experiments>
 @#$#@#$#@
