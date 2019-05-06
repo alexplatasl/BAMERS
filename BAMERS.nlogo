@@ -757,6 +757,14 @@ to plot-size-of-firms
   histogram map ln-hopital [production-Y] of fn-incumbent-firms
 end
 
+to plot-wealth-of-extorters
+  ifelse (any? workers with [extorter?])[
+    plot ln-hopital mean [wealth] of workers with [extorter?]
+  ][
+    plot 0
+  ]
+end
+
 to-report base-price
   report 1.5
 end
@@ -1468,7 +1476,7 @@ true
 "" ""
 PENS
 "regular" 1.0 0 -14439633 true "" "set-plot-x-range 0 (ticks + 5)\nset-plot-y-range 0 max (list 1 ceiling ln-hopital max [wealth] of workers)\nplot ln-hopital mean [wealth] of workers with [not extorter?]"
-"extorter" 1.0 0 -5298144 true "" "plot ln-hopital mean [wealth] of workers with [extorter?]"
+"extorter" 1.0 0 -5298144 true "" "plot-wealth-of-extorters"
 
 PLOT
 710
