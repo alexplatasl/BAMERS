@@ -476,18 +476,37 @@ to extortion-search
   let trials firms-to-extort-X
   while [trials > 0][
     ask workers with [extorter?][
-      ; extorter/worker goes randomly to a company (not already extorted by himself) to extort
       let my-extorted-firms firms-to-extort
-      let potential-firm-to-extort one-of firms with [not member? self my-extorted-firms]
-      ; if the randomly selected company has already been extorted by someone else who provides "protection", the worker loses his chance to extort
-      if ([not being-extorted?] of potential-firm-to-extort)[
-        ifelse (random 100 > rejection-probability)
-        [
-          set firms-to-extort (turtle-set potential-firm-to-extort); succesful extortion
-          ask potential-firm-to-extort [ set being-extorted? true]
+      ; extorter/worker goes randomly to a company (not already extorted by himself) to extort
+      ifelse (type-of-search = "random-search")[
+        let potential-firm-to-extort one-of firms with [not member? self my-extorted-firms]
+
+        ; if the randomly selected company has already been extorted by someone else who provides "protection", the worker loses his chance to extort
+        if ([not being-extorted?] of potential-firm-to-extort)[
+          ifelse (random 100 > rejection-probability)
+          [
+            set firms-to-extort (turtle-set potential-firm-to-extort); succesful extortion
+            ask potential-firm-to-extort [ set being-extorted? true]
+          ]
+          [set firms-to-punish (turtle-set potential-firm-to-extort)]; firm refused to pay (rare event with lower rejection-probabilities)
         ]
-        [set firms-to-punish (turtle-set potential-firm-to-extort)]; firm refused to pay (rare event with lower rejection-probabilities)
+
+      ][
+        ; extorter/worker goes to a nearest company (not already extorted by himself) to extort
+        let potential-firm-to-extort min-one-of firms with [not member? self my-extorted-firms] [distance myself]
+
+        ; if the randomly selected company has already been extorted by someone else who provides "protection", the worker loses his chance to extort
+        if ([not being-extorted?] of potential-firm-to-extort)[
+          ifelse (random 100 > rejection-probability)
+          [
+            set firms-to-extort (turtle-set potential-firm-to-extort); succesful extortion
+            ask potential-firm-to-extort [ set being-extorted? true]
+          ]
+          [set firms-to-punish (turtle-set potential-firm-to-extort)]; firm refused to pay (rare event with lower rejection-probabilities)
+        ]
+
       ]
+
     ]
     set trials trials - 1
   ]
@@ -1106,7 +1125,7 @@ true
 PENS
 "mean" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nplot mean [propensity-to-consume-c] of workers"
 "min" 1.0 2 -2674135 true "" "plot min [propensity-to-consume-c] of workers"
-"max" 1.0 2 -13345367 true "" "plot max [propensity-to-consume-c] of workers"
+"max" 1.0 0 -13345367 true "" "plot max [propensity-to-consume-c] of workers"
 
 PLOT
 977
@@ -1765,6 +1784,26 @@ TEXTBOX
 12
 5.0
 1
+
+TEXTBOX
+10
+510
+200
+528
+Searching strategy
+12
+0.0
+1
+
+CHOOSER
+5
+525
+195
+570
+type-of-search
+type-of-search
+"random-search" "around-search"
+0
 
 @#$#@#$#@
 Overview
