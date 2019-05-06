@@ -515,10 +515,16 @@ end
 to execute-extortion
   ask workers with [any? firms-to-extort][
     ask firms-to-extort [
-      set amount-of-pizzo max (list 0 (net-worth-A * (proportion-of-pizzo / 100)))
-      set net-worth-A net-worth-A - amount-of-pizzo
+      ifelse (type-of-pizzo = "proportion")[
+        set amount-of-pizzo max (list 0 (net-worth-A * (proportion-of-pizzo / 100)))
+        set net-worth-A net-worth-A - amount-of-pizzo
+      ]
+      [
+        set amount-of-pizzo ifelse-value (net-worth-A > 0) [min (list net-worth-A constant-pizzo)][0]
+        set net-worth-A net-worth-A - amount-of-pizzo
+      ]
     ]
-    set wealth sum [amount-of-pizzo] of firms-to-extort
+    set wealth wealth + sum [amount-of-pizzo] of firms-to-extort
   ]
 end
 
@@ -1593,10 +1599,10 @@ rejection-probability
 HORIZONTAL
 
 SLIDER
-270
-690
-495
-723
+25
+660
+195
+693
 proportion-of-pizzo
 proportion-of-pizzo
 0
@@ -1692,10 +1698,10 @@ TEXTBOX
 1
 
 TEXTBOX
-585
-705
-630
-723
+220
+675
+250
+693
 10%
 12
 5.0
@@ -1759,13 +1765,13 @@ PENS
 "default" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nplot (gini-index-reserve / round (number-of-firms * 5)) / 0.5"
 
 TEXTBOX
-285
-670
-555
-688
+10
+580
+205
+598
 Pizzo payment parameters
 12
-5.0
+0.0
 1
 
 SLIDER
@@ -1812,6 +1818,61 @@ type-of-search
 type-of-search
 "random-search" "around-search"
 0
+
+CHOOSER
+5
+595
+195
+640
+type-of-pizzo
+type-of-pizzo
+"proportion" "constant"
+1
+
+TEXTBOX
+25
+645
+175
+663
+Used if \"proportion\"
+12
+3.0
+1
+
+TEXTBOX
+25
+700
+175
+718
+Used if \"constant\"
+12
+3.0
+1
+
+SLIDER
+25
+720
+195
+753
+constant-pizzo
+constant-pizzo
+1
+100
+1.0
+1
+1
+$
+HORIZONTAL
+
+TEXTBOX
+220
+735
+245
+753
+1
+12
+5.0
+1
 
 @#$#@#$#@
 Overview
