@@ -541,8 +541,9 @@ to jail-or-punishment
   set confiscated-money 0; reset confiscated money each tick
   let needy-shops (turtle-set [firms-to-punish] of workers with [any? firms-to-punish])
   ask workers with [any? firms-to-punish][
-    ; greater the number of extorted companies, greater the probability of being imprisoned
-    ifelse (random 100 < (probability-of-being-caught * count firms-to-punish)) [
+    ; greater the number of extorted firms, greater the probability of being imprisoned
+    let caught? n-values (count firms-to-punish) [random 100 < probability-of-being-caught]
+    ifelse ( length filter [i -> i = TRUE] caught? > 0 ) [
       ; extortionists are imprisoned
       set time-in-jail 6
       set firms-to-extort no-turtles
@@ -1889,9 +1890,9 @@ prop
 
 SWITCH
 270
-660
+665
 472
-693
+698
 proportional-refund?
 proportional-refund?
 0
