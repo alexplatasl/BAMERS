@@ -539,7 +539,7 @@ end
 to jail-or-punishment
   ; The companies that refused to pay pizzo, call the police, and with a probability of being caught, extortionists are imprisoned
   set confiscated-money 0; reset confiscated money each tick
-  let needy-shops (turtle-set [firms-to-punish] of workers with [any? firms-to-punish])
+  let needy-shops no-turtles
   ask workers with [any? firms-to-punish][
     ; greater the number of extorted firms, greater the probability of being imprisoned
     let caught? n-values (count firms-to-punish) [random 100 < probability-of-being-caught]
@@ -556,12 +556,26 @@ to jail-or-punishment
         ; amount of punish is three times greater than amount of the pizzo
         set amount-of-punish max (list 0 (net-worth-A * ((proportion-of-pizzo * 3) / 100)))
         set net-worth-A net-worth-A - amount-of-punish
+        set needy-shops (turtle-set [firms-to-punish] of workers with [any? firms-to-punish])
       ]
       set wealth sum [amount-of-punish] of firms-to-punish
     ]
   ]
-  ask needy-shops [
-    set net-worth-A net-worth-A + ( confiscated-money / count needy-shops )
+  if (count needy-shops > 0)[
+    ifelse (proportional-refund?)[; Refund is proportional
+      ask needy-shops [
+        set net-worth-A net-worth-A + ( confiscated-money / count needy-shops )
+      ]
+    ][; Refund "First to come" instead proportional
+      while [confiscated-money > 0 and count needy-shops > 0][
+        let first-firm-to-come one-of needy-shops
+        ask first-firm-to-come [
+          set net-worth-A net-worth-A + min (list amount-of-punish confiscated-money)
+          set needy-shops other needy-shops
+        ]
+        set confiscated-money confiscated-money - [amount-of-punish] of first-firm-to-come
+      ]
+    ]
   ]
 end
 
@@ -1552,7 +1566,7 @@ propensity-to-be-extorter-epsilon
 propensity-to-be-extorter-epsilon
 0
 100
-60.0
+5.0
 5
 1
 %
@@ -1895,7 +1909,7 @@ SWITCH
 698
 proportional-refund?
 proportional-refund?
-0
+1
 1
 -1000
 
