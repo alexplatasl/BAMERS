@@ -61,6 +61,7 @@ workers-own[
   propensity-to-consume-c
   my-stores
   my-large-store
+  ; extortion variables
   extorter?
   firms-to-extort
   firms-to-punish
@@ -139,8 +140,8 @@ to initialize-variables
     set my-borrowing-firms no-turtles
     set bankrupt? false
   ]
-  set quarters-average-price array:from-list n-values 4 [base-price]
-  set quarters-inflation array:from-list n-values 4 [0]
+  set quarters-average-price array:from-list n-values (ifelse-value (quarterly-time-scale?)[4][12]) [base-price]
+  set quarters-inflation array:from-list n-values (ifelse-value (quarterly-time-scale?)[4][12]) [0]
 end
 
 to start-firms [#firms]
@@ -198,11 +199,11 @@ to firms-calculate-production
   ask firms [
     set desired-production-Yd expected-demand-De; submodel 2
   ]
-  array:set quarters-average-price (ticks mod 4) mean [individual-price-P] of firms
-  let actual-price array:item quarters-average-price (ticks mod 4)
-  let previous-price array:item quarters-average-price ((ticks - 1) mod 4)
+  array:set quarters-average-price (ticks mod (ifelse-value (quarterly-time-scale?)[4][12])) mean [individual-price-P] of firms
+  let actual-price array:item quarters-average-price (ticks mod (ifelse-value (quarterly-time-scale?)[4][12]))
+  let previous-price array:item quarters-average-price ((ticks - 1) mod (ifelse-value (quarterly-time-scale?)[4][12]))
   let quarter-inflation ((actual-price - previous-price) / previous-price) * 100
-  array:set quarters-inflation (ticks mod 4) quarter-inflation
+  array:set quarters-inflation (ticks mod (ifelse-value (quarterly-time-scale?)[4][12])) quarter-inflation
 end
 
 to adapt-expected-demand-or-price
@@ -225,12 +226,12 @@ end
 
 ;;;;;;;;;; to labor-market  ;;;;;;;;;;
 to labor-market
-  let law-minimum-wage ifelse-value (ticks > 0 and ticks mod 4 = 0 )[fn-minimum-wage-W-hat][[minimum-wage-W-hat] of firms]
+  let law-minimum-wage ifelse-value (ticks > 0 and ticks mod (ifelse-value (quarterly-time-scale?)[4][12]) = 0 )[fn-minimum-wage-W-hat][[minimum-wage-W-hat] of firms]
   ask firms [
     set desired-labor-force-Ld ceiling (desired-production-Yd / labor-productivity-alpha); submodel 3
     set current-numbers-employees-L0 count my-employees; summodel 4
     set number-of-vacancies-offered-V max(list (desired-labor-force-Ld - current-numbers-employees-L0) 0 ); submodel 5
-    if (ticks > 0 and ticks mod 4 = 0 )
+    if (ticks > 0 and ticks mod (ifelse-value (quarterly-time-scale?)[4][12]) = 0 )
     [
       set minimum-wage-W-hat law-minimum-wage; submodel 6
     ]
@@ -494,7 +495,6 @@ to extortion-search
           ]; If the expected risk is low, firm do not accept to pay the pizzo and go to the list of potential punished
           [set firms-to-punish (turtle-set potential-firm-to-extort)];
         ]
-
       ][
         ; extorter/worker goes to a nearest firm (not already extorted by himself) to extort
         let potential-firm-to-extort min-one-of firms with [not member? self my-extorted-firms] [distance myself]
@@ -738,7 +738,7 @@ end
 
 to-report CPI
   let base base-price
-  let current array:item quarters-average-price (ticks mod 4)
+  let current array:item quarters-average-price (ticks mod (ifelse-value (quarterly-time-scale?)[4][12]))
   report (current / base) * 100
 end
 
@@ -757,16 +757,15 @@ to-report logarithm-of-households-consumption
 end
 
 to-report fn-unemployment-rate
-  report count workers with [not employed?] / count workers
+  report count workers with [not employed? and time-in-jail < 1] / count workers with [time-in-jail < 1]
 end
 
-to unemployment-rate
-  let unemployed count workers with [not employed?]
-  plot unemployed / count workers
+to plot-unemployment-rate
+  plot fn-unemployment-rate
 end
 
 to-report quarterly-inflation
-  let q-inflation array:item quarters-inflation (ticks mod 4)
+  let q-inflation array:item quarters-inflation (ticks mod (ifelse-value (quarterly-time-scale?)[4][12]))
   report q-inflation
 end
 
@@ -1032,7 +1031,7 @@ PLOT
 974
 130
 Unemployment rate
-Quarter
+Time
 NIL
 0.0
 10.0
@@ -1042,7 +1041,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "set-plot-x-range 0  (ticks + 5)\nset-plot-y-range 0  0.3\nunemployment-rate"
+"default" 1.0 0 -16777216 true "" "set-plot-x-range 0  (ticks + 5)\nset-plot-y-range 0  0.3\nplot-unemployment-rate"
 "pen-1" 1.0 2 -7500403 true "" "plot 0"
 "pen-2" 1.0 0 -2674135 true "" "plot 0.10"
 
@@ -1130,7 +1129,7 @@ PLOT
 1512
 130
 log (Net worth) of firms
-Quarter
+Time
 NIL
 0.0
 10.0
@@ -1150,7 +1149,7 @@ PLOT
 974
 253
 Propensity to consume
-Quarter
+Time
 NIL
 0.0
 10.0
@@ -1169,8 +1168,8 @@ PLOT
 133
 1243
 253
-Quarterly inflation
-Quarter
+Time scale inflation
+Time
 %
 0.0
 10.0
@@ -1199,8 +1198,8 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "set-plot-x-range max list 0 (ceiling (ticks / 4) - 125) ceiling (ticks / 4) + 1\nset-plot-y-range -2 6\nif (ticks > 0 and ticks mod 4 = 0 )[\nplot-annualized-inflation]"
-"pen-1" 1.0 0 -7500403 true "" "set-plot-x-range max list 0 (ceiling (ticks / 4) - 125) ceiling (ticks / 4) + 1\nif (ticks > 0 and ticks mod 4 = 0 )[plot 0]"
+"default" 1.0 0 -16777216 true "" "set-plot-x-range max list 0 (ceiling (ticks / (ifelse-value (quarterly-time-scale?)[4][12])) - 125) ceiling (ticks / (ifelse-value (quarterly-time-scale?)[4][12])) + 1\nset-plot-y-range -2 6\nif (ticks > 0 and ticks mod (ifelse-value (quarterly-time-scale?)[4][12]) = 0 )[\nplot-annualized-inflation]"
+"pen-1" 1.0 0 -7500403 true "" "set-plot-x-range max list 0 (ceiling (ticks / (ifelse-value (quarterly-time-scale?)[4][12])) - 125) ceiling (ticks / (ifelse-value (quarterly-time-scale?)[4][12])) + 1\nif (ticks > 0 and ticks mod (ifelse-value (quarterly-time-scale?)[4][12]) = 0 )[plot 0]"
 
 TEXTBOX
 7
@@ -1233,7 +1232,7 @@ PLOT
 974
 376
 Ln real GDP
-Quater
+Time
 NIL
 0.0
 10.0
@@ -1251,7 +1250,7 @@ PLOT
 1243
 376
 Ln of consumption
-Quarter
+Time
 NIL
 0.0
 10.0
@@ -1269,7 +1268,7 @@ PLOT
 1512
 376
 Ln Price of firms
-Quarter
+Time
 NIL
 0.0
 10.0
@@ -1435,7 +1434,7 @@ PLOT
 1776
 130
 Production of firms
-Quarter
+Time
 Quantity
 0.0
 10.0
@@ -1455,7 +1454,7 @@ PLOT
 1776
 253
 Desired production
-Quarter
+Time
 Quantity
 0.0
 10.0
@@ -1476,7 +1475,7 @@ PLOT
 1776
 377
 Contractual interest rate
-Quaters
+Time
 %
 0.0
 10.0
@@ -1494,7 +1493,7 @@ PLOT
 1776
 501
 Wealth of workers
-Quarter
+Time
 Ln
 0.0
 10.0
@@ -1513,7 +1512,7 @@ PLOT
 975
 625
 Inventory-S
-Quarter
+Time
 Ln
 0.0
 10.0
@@ -1533,7 +1532,7 @@ PLOT
 1245
 625
 Banks patrimonial base
-Quarter
+Time
 Ln
 0.0
 10.0
@@ -1593,7 +1592,7 @@ PLOT
 1515
 625
 Extorters & Extorted
-NIL
+Time
 NIL
 0.0
 1.0
@@ -1627,7 +1626,7 @@ PLOT
 1775
 625
 Sum of pizzo & punish
-NIL
+Time
 NIL
 0.0
 4.0
@@ -1661,7 +1660,7 @@ PLOT
 974
 499
 wage-offered-Wb
-Quarter
+Time
 NIL
 0.0
 10.0
@@ -1760,7 +1759,7 @@ PLOT
 1245
 750
 Gini index
-Quarter
+Time
 Gini
 0.0
 10.0
@@ -1904,12 +1903,12 @@ prop
 
 SWITCH
 270
-665
+645
 472
-698
+678
 proportional-refund?
 proportional-refund?
-1
+0
 1
 -1000
 
@@ -1927,6 +1926,37 @@ rejection-threshold
 1
 %
 HORIZONTAL
+
+SWITCH
+270
+715
+472
+748
+quarterly-time-scale?
+quarterly-time-scale?
+1
+1
+-1000
+
+TEXTBOX
+475
+655
+625
+673
+Otherwise, first to come
+12
+5.0
+1
+
+TEXTBOX
+475
+725
+635
+751
+Otherwise, monthly scale
+12
+5.0
+1
 
 @#$#@#$#@
 Overview
