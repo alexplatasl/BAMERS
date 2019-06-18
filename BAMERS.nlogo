@@ -485,9 +485,9 @@ to extortion-search
         ; if the randomly selected company has already been extorted by someone else who provides "protection", the worker loses his chance to extort
         if ([not being-extorted?] of potential-firm-to-extort)[
           ; How many of the observable firms are being extorted?
-          let observable-firms 3
-          let around-firms min-n-of observable-firms other firms [distance potential-firm-to-extort]
-          let expected-risk count around-firms with [being-extorted?] / observable-firms
+          let closest-firms 3
+          let around-firms min-n-of closest-firms other firms [distance potential-firm-to-extort]
+          let expected-risk 100 * (count around-firms with [being-extorted?] / closest-firms)
           ifelse (expected-risk > rejection-threshold); If the expected risk is high, firm accept to pay the pizzo
           [; A threshold of 0% represents that the company at the slightest hint of extortion in the area will choose to pay the pizzo
             set firms-to-extort (turtle-set potential-firm-to-extort); succesful extortion
@@ -502,9 +502,9 @@ to extortion-search
         ; if the selected firm has already been extorted by someone else who provides "protection", the worker loses his chance to extort
         if ([not being-extorted?] of potential-firm-to-extort)[
           ; How many of the observable firms are being extorted?
-          let observable-firms 3
-          let around-firms min-n-of observable-firms other firms [distance potential-firm-to-extort]
-          let expected-risk count around-firms with [being-extorted?] / observable-firms
+          let closest-firms 3
+          let around-firms min-n-of closest-firms other firms [distance potential-firm-to-extort]
+          let expected-risk 100 * (count around-firms with [being-extorted?] / closest-firms)
           ifelse (expected-risk > rejection-threshold); If the expected risk is high, firm accept to pay the pizzo
           [; A threshold of 0% represents that the company at the slightest hint of extortion in the area will choose to pay the pizzo
             set firms-to-extort (turtle-set potential-firm-to-extort); succesful extortion
@@ -554,7 +554,7 @@ to jail-or-punishment
       ; Extorters punish firms!
       ask firms-to-punish [
         ; amount of punish is three times greater than amount of the pizzo
-        set amount-of-punish max (list 0 (net-worth-A * ((proportion-of-pizzo * 3) / 100)))
+        set amount-of-punish max (list 0 (net-worth-A * ((proportion-of-punish) / 100)))
         set net-worth-A net-worth-A - amount-of-punish
         set needy-shops (turtle-set [firms-to-punish] of workers with [any? firms-to-punish])
       ]
@@ -785,12 +785,16 @@ to plot-size-of-firms
   histogram map ln-hopital [production-Y] of fn-incumbent-firms
 end
 
-to plot-wealth-of-extorters
+to-report fn-wealth-of-extorters
   ifelse (any? workers with [extorter?])[
-    plot ln-hopital mean [wealth] of workers with [extorter?]
+    report ln-hopital mean [wealth] of workers with [extorter?]
   ][
-    plot 0
+    report 0
   ]
+end
+
+to plot-wealth-of-extorters
+  plot fn-wealth-of-extorters
 end
 
 to-report base-price
@@ -1559,13 +1563,13 @@ General extortion parameters
 SLIDER
 270
 470
-577
+575
 503
 propensity-to-be-extorter-epsilon
 propensity-to-be-extorter-epsilon
 0
 100
-5.0
+30.0
 5
 1
 %
@@ -1648,7 +1652,7 @@ probability-of-being-caught
 probability-of-being-caught
 0
 100
-10.0
+40.0
 5
 1
 %
@@ -1834,7 +1838,7 @@ CHOOSER
 type-of-pizzo
 type-of-pizzo
 "proportion" "constant"
-1
+0
 
 TEXTBOX
 25
@@ -1903,9 +1907,9 @@ prop
 
 SWITCH
 270
-645
+680
 472
-678
+713
 proportional-refund?
 proportional-refund?
 0
@@ -1921,7 +1925,7 @@ rejection-threshold
 rejection-threshold
 0
 100
-0.0
+35.0
 30
 1
 %
@@ -1934,15 +1938,15 @@ SWITCH
 748
 quarterly-time-scale?
 quarterly-time-scale?
-1
+0
 1
 -1000
 
 TEXTBOX
 475
-655
+690
 625
-673
+708
 Otherwise, first to come
 12
 5.0
@@ -1954,6 +1958,31 @@ TEXTBOX
 635
 751
 Otherwise, monthly scale
+12
+5.0
+1
+
+SLIDER
+270
+645
+575
+678
+proportion-of-punish
+proportion-of-punish
+25
+100
+25.0
+25
+1
+%
+HORIZONTAL
+
+TEXTBOX
+585
+660
+615
+678
+25%
 12
 5.0
 1
@@ -2643,7 +2672,7 @@ NetLogo 6.1.0
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="exploration" repetitions="100" runMetricsEveryStep="true">
+  <experiment name="thesis-extortion" repetitions="20" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
     <metric>fn-unemployment-rate</metric>
@@ -2666,39 +2695,80 @@ NetLogo 6.1.0
     <metric>ln mean [wage-offered-Wb] of firms</metric>
     <metric>ln-hopital mean [inventory-S] of firms</metric>
     <metric>ln-hopital mean [patrimonial-base-E] of banks</metric>
-    <steppedValueSet variable="probability-of-being-caught" first="5" step="5" last="100"/>
-  </experiment>
-  <experiment name="search-strategy" repetitions="100" runMetricsEveryStep="true">
-    <setup>setup</setup>
-    <go>go</go>
-    <metric>fn-unemployment-rate</metric>
-    <metric>mean [wealth] of workers</metric>
-    <metric>(gini-index-reserve / round (number-of-firms * 5)) / 0.5</metric>
-    <metric>skewness-of-wealth</metric>
-    <metric>count workers with [extorter?]</metric>
-    <metric>count firms with [being-extorted?]</metric>
-    <metric>sum [amount-of-pizzo] of firms</metric>
-    <metric>sum [amount-of-punish] of firms</metric>
-    <metric>mean [net-worth-A] of fn-incumbent-firms</metric>
-    <metric>mean [production-Y] of fn-incumbent-firms</metric>
-    <metric>mean [propensity-to-consume-c] of workers</metric>
-    <metric>quarterly-inflation</metric>
-    <metric>(annualized-inflation - 1) * 100</metric>
-    <metric>real-GDP</metric>
-    <metric>logarithm-of-households-consumption</metric>
-    <metric>ln average-market-price</metric>
-    <metric>100 * mean [my-interest-rate] of firms</metric>
-    <metric>ln mean [wage-offered-Wb] of firms</metric>
-    <metric>ln-hopital mean [inventory-S] of firms</metric>
-    <metric>ln-hopital mean [patrimonial-base-E] of banks</metric>
-    <metric>mean [wealth] of workers with [extorter?]</metric>
+    <metric>fn-wealth-of-extorters</metric>
     <enumeratedValueSet variable="type-of-search">
       <value value="&quot;random-search&quot;"/>
       <value value="&quot;around-search&quot;"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="type-of-pizzo">
       <value value="&quot;proportion&quot;"/>
-      <value value="&quot;constant&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="propensity-to-be-extorter-epsilon">
+      <value value="10"/>
+      <value value="20"/>
+      <value value="40"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="proportion-of-pizzo">
+      <value value="3"/>
+      <value value="10"/>
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="proportion-of-punish">
+      <value value="25"/>
+      <value value="50"/>
+      <value value="75"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="quarterly-time-scale?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="rejection-threshold">
+      <value value="15"/>
+      <value value="35"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="probability-of-being-caught">
+      <value value="20"/>
+      <value value="30"/>
+      <value value="80"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="percent-transfer-fondo">
+      <value value="0"/>
+      <value value="50"/>
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="proportional-refund?">
+      <value value="true"/>
+      <value value="false"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="thesis-baseline" repetitions="20" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <metric>fn-unemployment-rate</metric>
+    <metric>mean [wealth] of workers</metric>
+    <metric>(gini-index-reserve / round (number-of-firms * 5)) / 0.5</metric>
+    <metric>skewness-of-wealth</metric>
+    <metric>count workers with [extorter?]</metric>
+    <metric>count firms with [being-extorted?]</metric>
+    <metric>sum [amount-of-pizzo] of firms</metric>
+    <metric>sum [amount-of-punish] of firms</metric>
+    <metric>mean [net-worth-A] of fn-incumbent-firms</metric>
+    <metric>mean [production-Y] of fn-incumbent-firms</metric>
+    <metric>mean [propensity-to-consume-c] of workers</metric>
+    <metric>quarterly-inflation</metric>
+    <metric>(annualized-inflation - 1) * 100</metric>
+    <metric>real-GDP</metric>
+    <metric>logarithm-of-households-consumption</metric>
+    <metric>ln average-market-price</metric>
+    <metric>100 * mean [my-interest-rate] of firms</metric>
+    <metric>ln mean [wage-offered-Wb] of firms</metric>
+    <metric>ln-hopital mean [inventory-S] of firms</metric>
+    <metric>ln-hopital mean [patrimonial-base-E] of banks</metric>
+    <metric>fn-wealth-of-extorters</metric>
+    <enumeratedValueSet variable="propensity-to-be-extorter-epsilon">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="quarterly-time-scale?">
+      <value value="false"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>
