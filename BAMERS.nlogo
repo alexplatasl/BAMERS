@@ -1569,7 +1569,7 @@ propensity-to-be-extorter-epsilon
 propensity-to-be-extorter-epsilon
 0
 100
-30.0
+10.0
 5
 1
 %
@@ -1652,7 +1652,7 @@ probability-of-being-caught
 probability-of-being-caught
 0
 100
-40.0
+100.0
 5
 1
 %
@@ -1925,7 +1925,7 @@ rejection-threshold
 rejection-threshold
 0
 100
-35.0
+15.0
 30
 1
 %
@@ -1938,7 +1938,7 @@ SWITCH
 748
 quarterly-time-scale?
 quarterly-time-scale?
-0
+1
 1
 -1000
 
