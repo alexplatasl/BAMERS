@@ -45,6 +45,7 @@ firms-own[
   y-position
   ; extortion variables
   being-extorted?
+  being-punished?
   amount-of-pizzo
   amount-of-punish
 ]
@@ -65,6 +66,7 @@ workers-own[
   extorter?
   firms-to-extort
   firms-to-punish
+  in-jail?
   time-in-jail
 ]
 
@@ -116,6 +118,7 @@ to initialize-variables
     set revenue-R 0
     set retained-profits-pi 0
     set being-extorted? false
+    set being-punished? false
   ]
   ask workers [
     set employed? false
@@ -131,6 +134,7 @@ to initialize-variables
     set extorter? false
     set firms-to-extort no-turtles
     set firms-to-punish no-turtles
+    set in-jail? false
     set time-in-jail 0
   ]
   ask banks [
@@ -488,11 +492,11 @@ to extortion-search
         let potential-firm-to-extort one-of firms with [not member? self my-extorted-firms]
 
         ; if the randomly selected company has already been extorted by someone else who provides "protection", the worker loses his chance to extort
-        if ([not being-extorted?] of potential-firm-to-extort)[
+        if ([not being-extorted? or not being-punished?] of potential-firm-to-extort)[
           ; How many of the observable firms are being extorted?
           let closest-firms 3
           let around-firms min-n-of closest-firms other firms [distance potential-firm-to-extort]
-          let expected-risk 100 * (count around-firms with [being-extorted?] / closest-firms)
+          let expected-risk 100 * (count around-firms with [being-extorted? or being-punished?] / closest-firms)
           ifelse (expected-risk >= rejection-threshold); If the expected risk is high, firm accept to pay the pizzo
           [; A threshold of 0% represents that the company at the slightest hint of extortion in the area will choose to pay the pizzo
             set firms-to-extort (turtle-set potential-firm-to-extort); succesful extortion
@@ -505,11 +509,11 @@ to extortion-search
         let potential-firm-to-extort min-one-of firms with [not member? self my-extorted-firms] [distance myself]
 
         ; if the selected firm has already been extorted by someone else who provides "protection", the worker loses his chance to extort
-        if ([not being-extorted?] of potential-firm-to-extort)[
+        if ([not being-extorted? or not being-punished?] of potential-firm-to-extort)[
           ; How many of the observable firms are being extorted?
           let closest-firms 3
           let around-firms min-n-of closest-firms other firms [distance potential-firm-to-extort]
-          let expected-risk 100 * (count around-firms with [being-extorted?] / closest-firms)
+          let expected-risk 100 * (count around-firms with [being-extorted? or being-punished?] / closest-firms)
           ifelse (expected-risk >= rejection-threshold); If the expected risk is high, firm accept to pay the pizzo
           [; A threshold of 0% represents that the company at the slightest hint of extortion in the area will choose to pay the pizzo
             set firms-to-extort (turtle-set potential-firm-to-extort); succesful extortion
@@ -550,7 +554,7 @@ to jail-or-punishment
     let caught? n-values (count firms-to-punish) [random 100 < probability-of-being-caught-lambda]
     ifelse ( length filter [i -> i = TRUE] caught? > 0 )[
       ; extortionists are imprisoned
-      set extorter? false
+      set in-jail? true
       set time-in-jail 6
       set firms-to-extort no-turtles
       set firms-to-punish no-turtles
@@ -559,6 +563,7 @@ to jail-or-punishment
     ][
       ; Extorters punish firms!
       ask firms-to-punish [
+        set being-punished? true
         set amount-of-punish max (list 0 (net-worth-A * ((proportion-of-punish) / 100)))
         set net-worth-A net-worth-A - amount-of-punish
         set needy-shops (turtle-set [firms-to-punish] of workers with [any? firms-to-punish])
@@ -588,7 +593,8 @@ to in-jail
   ask workers with [time-in-jail > 0][
     set time-in-jail time-in-jail - 1
   ]
-  ask workers with [time-in-jail < 1 and extorter?][
+  ask workers with [in-jail? and time-in-jail < 1][
+    set extorter? false
     set color yellow
   ]
 end
@@ -674,6 +680,7 @@ to replace-bankrupt
       set individual-price-P  1.26 * average-market-price
       ;-----------------
       set being-extorted? false
+      set being-punished? false
       set amount-of-pizzo 0
     ]
   ]
@@ -1611,7 +1618,7 @@ SLIDER
 firms-to-extort-X
 firms-to-extort-X
 1
-5
+3
 1.0
 1
 1
@@ -1636,6 +1643,7 @@ true
 PENS
 "Extorters" 1.0 0 -5298144 true "" "set-plot-x-range 0 (ticks + 5)\nplot count workers with [extorter?]"
 "Extorted" 1.0 0 -14070903 true "" "plot count firms with [being-extorted?]"
+"In-jail" 1.0 0 -955883 true "" "plot count workers with [time-in-jail > 0]"
 
 SLIDER
 25
