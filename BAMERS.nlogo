@@ -84,6 +84,7 @@ banks-own[
 ; Setup procedures
 to setup
   clear-all
+  ;reset-timer
 
   start-firms number-of-firms
   start-workers round (number-of-firms * 5)
@@ -174,6 +175,10 @@ to start-banks [#banks]
 end
 
 to go
+  ;if (ticks mod 100 = 0)[
+  ;  export-view (word "view_" (ticks / 100) ".png")
+  ;  export-interface (word "inte_" (ticks / 100) ".png")
+  ;]
   if (ticks >= 1000
     ;or (ticks > 600 and fn-unemployment-rate > 0.5)
     ;or (ticks > 600 and abs annualized-inflation > 0.25)
@@ -488,7 +493,7 @@ to extortion-search
           let closest-firms 3
           let around-firms min-n-of closest-firms other firms [distance potential-firm-to-extort]
           let expected-risk 100 * (count around-firms with [being-extorted?] / closest-firms)
-          ifelse (expected-risk > rejection-threshold); If the expected risk is high, firm accept to pay the pizzo
+          ifelse (expected-risk >= rejection-threshold); If the expected risk is high, firm accept to pay the pizzo
           [; A threshold of 0% represents that the company at the slightest hint of extortion in the area will choose to pay the pizzo
             set firms-to-extort (turtle-set potential-firm-to-extort); succesful extortion
             ask potential-firm-to-extort [ set being-extorted? true]
@@ -505,7 +510,7 @@ to extortion-search
           let closest-firms 3
           let around-firms min-n-of closest-firms other firms [distance potential-firm-to-extort]
           let expected-risk 100 * (count around-firms with [being-extorted?] / closest-firms)
-          ifelse (expected-risk > rejection-threshold); If the expected risk is high, firm accept to pay the pizzo
+          ifelse (expected-risk >= rejection-threshold); If the expected risk is high, firm accept to pay the pizzo
           [; A threshold of 0% represents that the company at the slightest hint of extortion in the area will choose to pay the pizzo
             set firms-to-extort (turtle-set potential-firm-to-extort); succesful extortion
             ask potential-firm-to-extort [ set being-extorted? true]
@@ -542,18 +547,18 @@ to jail-or-punishment
   let needy-shops no-turtles
   ask workers with [any? firms-to-punish][
     ; greater the number of extorted firms, greater the probability of being imprisoned
-    let caught? n-values (count firms-to-punish) [random 100 < probability-of-being-caught]
-    ifelse ( length filter [i -> i = TRUE] caught? > 0 ) [
+    let caught? n-values (count firms-to-punish) [random 100 < probability-of-being-caught-lambda]
+    ifelse ( length filter [i -> i = TRUE] caught? > 0 )[
       ; extortionists are imprisoned
+      set extorter? false
       set time-in-jail 6
       set firms-to-extort no-turtles
       set firms-to-punish no-turtles
       set confiscated-money confiscated-money + (wealth * (percent-transfer-fondo / 100))
-      set wealth 0
+      set wealth wealth - confiscated-money
     ][
       ; Extorters punish firms!
       ask firms-to-punish [
-        ; amount of punish is three times greater than amount of the pizzo
         set amount-of-punish max (list 0 (net-worth-A * ((proportion-of-punish) / 100)))
         set net-worth-A net-worth-A - amount-of-punish
         set needy-shops (turtle-set [firms-to-punish] of workers with [any? firms-to-punish])
@@ -584,7 +589,6 @@ to in-jail
     set time-in-jail time-in-jail - 1
   ]
   ask workers with [time-in-jail < 1 and extorter?][
-    set extorter? false
     set color yellow
   ]
 end
@@ -726,6 +730,10 @@ to-report lower-quartile [ xs ]
   report ifelse-value (empty? lower) [ med ] [ median lower ]
 end
 
+to-report tiempo
+  report timer
+end
+
 ; observation
 to-report nominal-GDP
   let output sum [production-Y * individual-price-P] of firms
@@ -832,6 +840,10 @@ to update-lorenz-and-gini
   ]
 end
 
+to-report gini-index
+  report (gini-index-reserve / round (number-of-firms * 5)) / 0.5
+end
+
 ; b_1 skewness is calculated following:
 ; Joanes, D.N. and Gill, C.A. (1998). Comparing measures of sample skewness and kurtosis.
 ; The Statistician, 47, 183–189.
@@ -849,6 +861,22 @@ to-report skewness-of-wealth
   ][
     report 0
   ]
+end
+
+to-report avg-propensity-to-consume
+  report mean [propensity-to-consume-c] of workers
+end
+
+to-report avg-interest-rate
+  report 100 * mean [my-interest-rate] of firms
+end
+
+to-report avg-wage-offered
+  report ln mean [wage-offered-Wb] of firms
+end
+
+to-report avg-net-worth
+  report mean [net-worth-A] of fn-incumbent-firms
 end
 
 to-report average-real-interest-rate
@@ -1569,7 +1597,7 @@ propensity-to-be-extorter-epsilon
 propensity-to-be-extorter-epsilon
 0
 100
-10.0
+20.0
 5
 1
 %
@@ -1583,7 +1611,7 @@ SLIDER
 firms-to-extort-X
 firms-to-extort-X
 1
-2
+5
 1.0
 1
 1
@@ -1648,11 +1676,11 @@ SLIDER
 575
 575
 608
-probability-of-being-caught
-probability-of-being-caught
+probability-of-being-caught-lambda
+probability-of-being-caught-lambda
 0
 100
-100.0
+30.0
 5
 1
 %
@@ -1683,7 +1711,7 @@ TEXTBOX
 485
 615
 503
-1%
+20%
 12
 5.0
 1
@@ -1723,7 +1751,7 @@ TEXTBOX
 555
 615
 573
-10%
+15%
 12
 5.0
 1
@@ -1733,7 +1761,7 @@ TEXTBOX
 590
 615
 608
-10%
+30%
 12
 5.0
 1
@@ -1794,7 +1822,7 @@ percent-transfer-fondo
 percent-transfer-fondo
 0
 100
-100.0
+50.0
 50
 1
 %
@@ -1805,7 +1833,7 @@ TEXTBOX
 625
 625
 643
-100%
+50%
 12
 5.0
 1
@@ -1926,7 +1954,7 @@ rejection-threshold
 0
 100
 15.0
-30
+15
 1
 %
 HORIZONTAL
@@ -2677,7 +2705,7 @@ NetLogo 6.1.0
     <go>go</go>
     <metric>fn-unemployment-rate</metric>
     <metric>mean [wealth] of workers</metric>
-    <metric>(gini-index-reserve / round (number-of-firms * 5)) / 0.5</metric>
+    <metric>gini-index</metric>
     <metric>skewness-of-wealth</metric>
     <metric>count workers with [extorter?]</metric>
     <metric>count firms with [being-extorted?]</metric>
@@ -2725,7 +2753,7 @@ NetLogo 6.1.0
       <value value="15"/>
       <value value="35"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="probability-of-being-caught">
+    <enumeratedValueSet variable="probability-of-being-caught-lambda">
       <value value="20"/>
       <value value="30"/>
       <value value="80"/>
@@ -2740,7 +2768,7 @@ NetLogo 6.1.0
       <value value="false"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="thesis-baseline" repetitions="20" runMetricsEveryStep="true">
+  <experiment name="thesis-baseline" repetitions="100" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
     <metric>fn-unemployment-rate</metric>
@@ -2764,11 +2792,188 @@ NetLogo 6.1.0
     <metric>ln-hopital mean [inventory-S] of firms</metric>
     <metric>ln-hopital mean [patrimonial-base-E] of banks</metric>
     <metric>fn-wealth-of-extorters</metric>
+    <enumeratedValueSet variable="type-of-search">
+      <value value="&quot;random-search&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="type-of-pizzo">
+      <value value="&quot;proportion&quot;"/>
+    </enumeratedValueSet>
     <enumeratedValueSet variable="propensity-to-be-extorter-epsilon">
       <value value="0"/>
     </enumeratedValueSet>
+    <enumeratedValueSet variable="proportion-of-pizzo">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="proportion-of-punish">
+      <value value="25"/>
+    </enumeratedValueSet>
     <enumeratedValueSet variable="quarterly-time-scale?">
       <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="rejection-threshold">
+      <value value="15"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="probability-of-being-caught-lambda">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="percent-transfer-fondo">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="proportional-refund?">
+      <value value="true"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="thesis-epsilon" repetitions="20" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <metric>fn-unemployment-rate</metric>
+    <metric>gini-index</metric>
+    <metric>skewness-of-wealth</metric>
+    <metric>avg-net-worth</metric>
+    <metric>avg-propensity-to-consume</metric>
+    <metric>real-GDP</metric>
+    <metric>average-market-price</metric>
+    <metric>avg-interest-rate</metric>
+    <enumeratedValueSet variable="type-of-search">
+      <value value="&quot;random-search&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="type-of-pizzo">
+      <value value="&quot;proportion&quot;"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="propensity-to-be-extorter-epsilon" first="0" step="5" last="100"/>
+    <enumeratedValueSet variable="proportion-of-pizzo">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="proportion-of-punish">
+      <value value="25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="quarterly-time-scale?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="rejection-threshold">
+      <value value="15"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="probability-of-being-caught-lambda">
+      <value value="30"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="percent-transfer-fondo">
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="proportional-refund?">
+      <value value="false"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="thesis-caught" repetitions="20" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <metric>fn-unemployment-rate</metric>
+    <metric>gini-index</metric>
+    <metric>skewness-of-wealth</metric>
+    <metric>avg-net-worth</metric>
+    <metric>avg-propensity-to-consume</metric>
+    <metric>real-GDP</metric>
+    <metric>average-market-price</metric>
+    <metric>avg-interest-rate</metric>
+    <enumeratedValueSet variable="type-of-search">
+      <value value="&quot;random-search&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="type-of-pizzo">
+      <value value="&quot;proportion&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="propensity-to-be-extorter-epsilon">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="proportion-of-pizzo">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="proportion-of-punish">
+      <value value="25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="quarterly-time-scale?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="rejection-threshold">
+      <value value="15"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="probability-of-being-caught-lambda" first="0" step="5" last="100"/>
+    <enumeratedValueSet variable="percent-transfer-fondo">
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="proportional-refund?">
+      <value value="false"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="test-economy" repetitions="1" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="200"/>
+    <metric>fn-unemployment-rate</metric>
+    <metric>gini-index</metric>
+    <metric>skewness-of-wealth</metric>
+    <metric>avg-net-worth</metric>
+    <metric>avg-propensity-to-consume</metric>
+    <metric>real-GDP</metric>
+    <metric>average-market-price</metric>
+    <metric>avg-interest-rate</metric>
+    <enumeratedValueSet variable="credit-market-H">
+      <value value="2"/>
+      <value value="3"/>
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="labor-market-M">
+      <value value="2"/>
+      <value value="3"/>
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="goods-market-Z">
+      <value value="2"/>
+      <value value="3"/>
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="wages-shock-xi">
+      <value value="0.05"/>
+      <value value="0.1"/>
+      <value value="0.15"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="price-shock-eta">
+      <value value="0.05"/>
+      <value value="0.1"/>
+      <value value="0.15"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="interest-shock-phi">
+      <value value="0.05"/>
+      <value value="0.1"/>
+      <value value="0.15"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="production-shock-rho">
+      <value value="0.05"/>
+      <value value="0.1"/>
+      <value value="0.15"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="test-troitzsch" repetitions="20" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="250"/>
+    <metric>fn-unemployment-rate</metric>
+    <metric>gini-index</metric>
+    <metric>skewness-of-wealth</metric>
+    <metric>avg-net-worth</metric>
+    <metric>avg-propensity-to-consume</metric>
+    <metric>real-GDP</metric>
+    <metric>average-market-price</metric>
+    <metric>fn-wealth-of-extorters</metric>
+    <steppedValueSet variable="rejection-threshold" first="15" step="15" last="90"/>
+    <steppedValueSet variable="probability-of-being-caught-lambda" first="10" step="10" last="70"/>
+    <steppedValueSet variable="propensity-to-be-extorter-epsilon" first="20" step="10" last="50"/>
+  </experiment>
+  <experiment name="tiempo" repetitions="10" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <metric>tiempo</metric>
+    <steppedValueSet variable="number-of-firms" first="45" step="5" last="510"/>
+    <enumeratedValueSet variable="propensity-to-be-extorter-epsilon">
+      <value value="20"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>
