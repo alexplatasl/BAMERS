@@ -812,6 +812,18 @@ to plot-wealth-of-extorters
   plot fn-wealth-of-extorters
 end
 
+to-report N-extorted-firms
+  report count firms with [being-extorted?]
+end
+
+to-report N-extorters
+  report count workers with [extorter?]
+end
+
+to-report N-extorters-in-jail
+  report count workers with [time-in-jail > 0]
+end
+
 to-report base-price
   report 1.5
 end
