@@ -2749,46 +2749,33 @@ NetLogo 6.1.0
     <metric>N-extorters-in-jail</metric>
     <enumeratedValueSet variable="type-of-search">
       <value value="&quot;random-search&quot;"/>
-      <value value="&quot;around-search&quot;"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="type-of-pizzo">
       <value value="&quot;proportion&quot;"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="propensity-to-be-extorter-epsilon">
-      <value value="10"/>
-      <value value="20"/>
-      <value value="40"/>
-    </enumeratedValueSet>
+    <steppedValueSet variable="propensity-to-be-extorter-epsilon" first="0" step="5" last="100"/>
     <enumeratedValueSet variable="proportion-of-pizzo">
-      <value value="3"/>
       <value value="10"/>
-      <value value="20"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="proportion-of-punish">
       <value value="25"/>
-      <value value="50"/>
-      <value value="75"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="quarterly-time-scale?">
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="rejection-threshold">
       <value value="15"/>
-      <value value="35"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="probability-of-being-caught-lambda">
-      <value value="20"/>
       <value value="30"/>
-      <value value="80"/>
+      <value value="45"/>
+      <value value="60"/>
+      <value value="75"/>
     </enumeratedValueSet>
+    <steppedValueSet variable="probability-of-being-caught-lambda" first="0" step="5" last="100"/>
     <enumeratedValueSet variable="percent-transfer-fondo">
-      <value value="0"/>
       <value value="50"/>
-      <value value="100"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="proportional-refund?">
       <value value="true"/>
-      <value value="false"/>
     </enumeratedValueSet>
   </experiment>
   <experiment name="thesis-baseline" repetitions="100" runMetricsEveryStep="true">
