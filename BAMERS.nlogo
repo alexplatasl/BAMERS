@@ -2744,6 +2744,9 @@ NetLogo 6.1.0
     <metric>ln-hopital mean [inventory-S] of firms</metric>
     <metric>ln-hopital mean [patrimonial-base-E] of banks</metric>
     <metric>fn-wealth-of-extorters</metric>
+    <metric>N-extorted-firms</metric>
+    <metric>N-extorters</metric>
+    <metric>N-extorters-in-jail</metric>
     <enumeratedValueSet variable="type-of-search">
       <value value="&quot;random-search&quot;"/>
       <value value="&quot;around-search&quot;"/>
