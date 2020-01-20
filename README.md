@@ -2,9 +2,9 @@
 
 BAMERS extends the economic model BAM (https://github.com/alexplatasl/BAMmodel) introducing extortionists in the system. In what follows, the model is described in detail following the ODD protocol.
 
-##Overview
+## Overview
 
-###Purpose
+### Purpose
 
 BAMERS is designed to explore the effect of the agent's extortion activities in macroeconomic signals like GDP, inflation, unemployment rate, and Gini index.
 
@@ -21,7 +21,7 @@ BAMERS is designed to explore the effect of the agent's extortion activities in 
 | ``amount-of-punish`` | Float | ``firms-to-punish`` | AgSet |
 |                      |       |  ``time-in-jail``   |  Int  |
 
-###Process overview and scheduling
+### Process overview and scheduling
 
 Extortion occurs before firms pay loan and dividends, step 6 in BAM's schedule (Platas, 2019). The schedule is as follows:
 
@@ -33,36 +33,36 @@ Extortion occurs before firms pay loan and dividends, step 6 in BAM's schedule (
 5.  Prisoners that have served their time in prison are released as regular workers.
 
 
-##Design concepts
+## Design concepts
 
-####Basic Principles    
+#### Basic Principles    
 
 Economic pressure and socioeconomic status induce a process of decision making on how to respond to basic needs, even considering the idea of becoming criminals. About this Abrahamsen (1949) says:
 
 > There are a few questions that are frequently asked in regard to our findings that family tension is the basic cause of criminal behavior. The first has to do with economics. It is reasonable to assume, intellectually speaking, that when one is without what is necessary for subsistence and cannot get it, he will simply take it for himself and his loved ones. This is instinctive, and it has to do with self-preservation.
 
-####Adaptation
+#### Adaptation
 
 Following the basic principles enunciated above, every time the goods market closes, the unemployed workers belonging to the poorest quartile in population decide if becoming extortionists with a propensity $\epsilon$. The propensity to become a criminal is orthogonal to any other variable, e.g., the efficiency of the police. This enables a controlled complete parameter exploration to evaluate the macroeconomic effect of extortion. When $\epsilon$ is equal to zero, our model corresponds to the baseline macroeconomic model without extortion, i.e., the BAM model.  
 
-####Sensing
+#### Sensing
 
 Firms can observe the nearest firms to know if they are paying for pizzo or not.
 
-####Interaction
+#### Interaction
 
 The interaction is generated when an extortionist finds a firm to request the payment of pizzo, the firms can refuse to pay it.
 
-####Stochasticity
+#### Stochasticity
 Elements that have random shocks are:
 
 
 * The decision to become an extortionist $\epsilon$.
 * The probability that the extortionist is caught by the police $\lambda$.
 
-##Details
+## Details
 
-###Initialization
+### Initialization
 
 Next Table shows the parameter initialization of the model. Values were adopted from Elsenbroich (2016), Troitzsch (2015a), Nardin (2016a) and Nardin (2017). 
 
@@ -79,7 +79,7 @@ Next Table shows the parameter initialization of the model. Values were adopted 
 | $T_j$      | Amount of time periods in jail            | 6     |
 
 
-###Submodels
+### Submodels
 
 1. The amount of extortionists changes every time step, each unemployed worker in the quartile with the lower savings $SA$ become a criminal if the propensity to be an extortionist $\epsilon$ is greater than a randomly generated value with a uniform distribution between 0 and 100.
 2. An extortionist has $X$ trials to find a new victim among the firms that are not already extorted.
