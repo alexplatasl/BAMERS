@@ -596,7 +596,7 @@ to in-jail
     set time-in-jail time-in-jail - 1
   ]
   ask workers with [in-jail? and time-in-jail < 1][
-    set extorter? false
+    ;; set extorter? false ;; redundant they stop being extorters when captured.
     set in-jail? false ;; They are being realeased
     set color yellow
   ]
