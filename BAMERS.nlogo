@@ -556,9 +556,9 @@ to jail-or-punishment
       ; extortionists are imprisoned
       set in-jail? true
       set time-in-jail 6
-      ask firms-to-extort [set being-extorted? false] ;; This firms are no longer extorted.
+      ask firms-to-extort [set being-extorted? false] ;; These firms are no longer extorted.
       set firms-to-extort no-turtles
-      ask firms-to-punish [set being-punished? false] ;; This firms are no longer punished.
+      ask firms-to-punish [set being-punished? false] ;; These firms are no longer punished.
       set firms-to-punish no-turtles
       set confiscated-money confiscated-money + (wealth * (percent-transfer-fondo / 100))
       set wealth wealth - confiscated-money
