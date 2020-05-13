@@ -555,6 +555,7 @@ to jail-or-punishment
     ifelse ( length filter [i -> i = TRUE] caught? > 0 )[
       ; extortionists are imprisoned
       set in-jail? true
+      set extorter? false
       set time-in-jail 6
       ask firms-to-extort [set being-extorted? false] ;; These firms are no longer extorted.
       set firms-to-extort no-turtles
