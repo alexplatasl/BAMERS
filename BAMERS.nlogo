@@ -474,6 +474,7 @@ end
 
 to become-extortionists
   let Q1 lower-quartile [savings] of workers
+  ;; Incluyes tambien a los extorsionadores pobres aquí. Si no estuvieran tendrías más candidatos a extorsionador, esto es relevante?
   ask workers with [not employed? and savings < Q1 ][
     if (random 100 < propensity-to-be-extorter-epsilon)[
       set extorter? true
