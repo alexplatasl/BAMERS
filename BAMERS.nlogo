@@ -499,7 +499,7 @@ to extortion-search
           let expected-risk 100 * (count around-firms with [being-extorted? or being-punished?] / closest-firms)
           ifelse (expected-risk >= rejection-threshold); If the expected risk is high, firm accept to pay the pizzo
           [; A threshold of 0% represents that the company at the slightest hint of extortion in the area will choose to pay the pizzo
-            set firms-to-extort (turtle-set potential-firm-to-extort); succesful extortion
+            set firms-to-extort (turtle-set firms-to-extort potential-firm-to-extort); succesful extortion
             ask potential-firm-to-extort [ set being-extorted? true]
           ]; If the expected risk is low, firm do not accept to pay the pizzo and go to the list of potential punished
           [set firms-to-punish (turtle-set potential-firm-to-extort)];
@@ -516,7 +516,7 @@ to extortion-search
           let expected-risk 100 * (count around-firms with [being-extorted? or being-punished?] / closest-firms)
           ifelse (expected-risk >= rejection-threshold); If the expected risk is high, firm accept to pay the pizzo
           [; A threshold of 0% represents that the company at the slightest hint of extortion in the area will choose to pay the pizzo
-            set firms-to-extort (turtle-set potential-firm-to-extort); succesful extortion
+            set firms-to-extort (turtle-set firms-to-extort potential-firm-to-extort); succesful extortion
             ask potential-firm-to-extort [ set being-extorted? true]
           ]; If the expected risk is low, firm do not accept to pay the pizzo and go to the list of potential punished
           [set firms-to-punish (turtle-set potential-firm-to-extort)];
