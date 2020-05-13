@@ -556,6 +556,7 @@ to jail-or-punishment
       ; extortionists are imprisoned
       set in-jail? true
       set time-in-jail 6
+      ask firms-to-extort [set being-extorted? false] ;; This firms are no longer extorted.
       set firms-to-extort no-turtles
       set firms-to-punish no-turtles
       set confiscated-money confiscated-money + (wealth * (percent-transfer-fondo / 100))
@@ -1616,7 +1617,7 @@ propensity-to-be-extorter-epsilon
 propensity-to-be-extorter-epsilon
 0
 100
-20.0
+60.0
 5
 1
 %
@@ -1700,7 +1701,7 @@ probability-of-being-caught-lambda
 probability-of-being-caught-lambda
 0
 100
-30.0
+60.0
 5
 1
 %
@@ -1973,7 +1974,7 @@ rejection-threshold
 rejection-threshold
 0
 100
-15.0
+45.0
 15
 1
 %
@@ -2715,7 +2716,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.1.0
+NetLogo 6.1.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
