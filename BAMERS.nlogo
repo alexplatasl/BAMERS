@@ -597,6 +597,7 @@ to in-jail
   ]
   ask workers with [in-jail? and time-in-jail < 1][
     set extorter? false
+    set in-jail? false ;; They are being realeased
     set color yellow
   ]
 end
