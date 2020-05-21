@@ -211,7 +211,7 @@ to firms-calculate-production
   array:set quarters-average-price (ticks mod (ifelse-value (quarterly-time-scale?)[4][12])) mean [individual-price-P] of firms
   let actual-price array:item quarters-average-price (ticks mod (ifelse-value (quarterly-time-scale?)[4][12]))
   let previous-price array:item quarters-average-price ((ticks - 1) mod (ifelse-value (quarterly-time-scale?)[4][12]))
-  let quarter-inflation ((actual-price - previous-price) / previous-price) * 100
+  let quarter-inflation ((actual-price - previous-price) / ifelse-value previous-price = 0 [0.00001][previous-price]) * 100    ; with safe division
   array:set quarters-inflation (ticks mod (ifelse-value (quarterly-time-scale?)[4][12])) quarter-inflation
 end
 
@@ -237,7 +237,7 @@ end
 to labor-market
   let law-minimum-wage ifelse-value (ticks > 0 and ticks mod (ifelse-value (quarterly-time-scale?)[4][12]) = 0 )[fn-minimum-wage-W-hat][[minimum-wage-W-hat] of firms]
   ask firms [
-    set desired-labor-force-Ld ceiling (desired-production-Yd / labor-productivity-alpha); submodel 3
+    set desired-labor-force-Ld ceiling (desired-production-Yd / ifelse-value labor-productivity-alpha = 0 [0.00001][labor-productivity-alpha]); submodel 3
     set current-numbers-employees-L0 count my-employees; summodel 4
     set number-of-vacancies-offered-V max(list (desired-labor-force-Ld - current-numbers-employees-L0) 0 ); submodel 5
     if (ticks > 0 and ticks mod (ifelse-value (quarterly-time-scale?)[4][12]) = 0 )
@@ -432,10 +432,10 @@ to goods-market ;; an observer procedure
     ifelse (any? turtle-set my-large-store)
       [
         let id-store [who] of my-large-store
-        set my-stores (turtle-set my-large-store n-of (goods-market-Z - 1) firms with [who != id-store])
+        set my-stores (turtle-set my-large-store n-of ( min list (goods-market-Z - 1) count firms with [who != id-store] ) firms with [who != id-store])    ; safe n-of: n-of ( min list NNN count ASET ) ASET
       ]
       [
-        set my-stores n-of goods-market-Z firms
+        set my-stores n-of ( min list goods-market-Z count firms ) firms
       ]
     set my-large-store max-one-of my-stores [production-Y]
     if (count my-stores != goods-market-Z) [show (word "Number of my stores " count my-stores " who " who)]
@@ -561,8 +561,9 @@ to jail-or-punishment
       set firms-to-extort no-turtles
       ask firms-to-punish [set being-punished? false] ;; These firms are no longer punished.
       set firms-to-punish no-turtles
-      set confiscated-money confiscated-money + (wealth * (percent-transfer-fondo / 100))
-      set wealth wealth - confiscated-money
+      let amount-confiscated max (list 0 (wealth * (percent-transfer-fondo / 100)))
+      set confiscated-money confiscated-money + amount-confiscated
+      set wealth wealth - amount-confiscated
     ][
       ; Extorters punish firms!
       ask firms-to-punish [
@@ -803,6 +804,7 @@ to plot-size-of-firms
   histogram map ln-hopital [production-Y] of fn-incumbent-firms
 end
 
+;; Reporters for extortion variables
 to-report fn-wealth-of-extorters
   ifelse (any? workers with [extorter?])[
     report ln-hopital mean [wealth] of workers with [extorter?]
@@ -819,8 +821,12 @@ to-report N-extorted-firms
   report count firms with [being-extorted?]
 end
 
+to-report N-punished-firms
+  report count firms with [being-punished?]
+end
+
 to-report N-extorters
-  report count workers with [extorter?]
+  report count workers with [extorter? and time-in-jail < 1]
 end
 
 to-report N-extorters-in-jail
@@ -2748,6 +2754,7 @@ NetLogo 6.1.1
     <metric>ln-hopital mean [patrimonial-base-E] of banks</metric>
     <metric>fn-wealth-of-extorters</metric>
     <metric>N-extorted-firms</metric>
+    <metric>N-punished-firms</metric>
     <metric>N-extorters</metric>
     <metric>N-extorters-in-jail</metric>
     <enumeratedValueSet variable="type-of-search">
@@ -2768,10 +2775,7 @@ NetLogo 6.1.1
     </enumeratedValueSet>
     <enumeratedValueSet variable="rejection-threshold">
       <value value="15"/>
-      <value value="30"/>
       <value value="45"/>
-      <value value="60"/>
-      <value value="75"/>
     </enumeratedValueSet>
     <steppedValueSet variable="probability-of-being-caught-lambda" first="0" step="5" last="100"/>
     <enumeratedValueSet variable="percent-transfer-fondo">
