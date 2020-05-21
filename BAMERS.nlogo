@@ -12,6 +12,12 @@ globals [
   confiscated-money
   gini-index-reserve
   lorenz-points
+  ; current stats recorded of incumbent firms used to replace bankrupt ones
+  new-firms-production-Y
+  new-firms-minimum-wage-W-hat
+  new-firms-wage-offered-Wb
+  new-firms-net-worth-A
+  new-firms-individual-price-P
 ]
 
 firms-own[
@@ -664,6 +670,13 @@ end
 to replace-bankrupt
   if (count firms < number-of-firms)[
     let incumbent-firms fn-incumbent-firms
+    if (any? incumbent-firms) [
+      set new-firms-production-Y ceiling mean [production-Y] of incumbent-firms
+      set new-firms-minimum-wage-W-hat min [minimum-wage-W-hat] of incumbent-firms
+      set new-firms-wage-offered-Wb (1 - size-replacing-firms) * mean [wage-offered-Wb] of incumbent-firms
+      set new-firms-net-worth-A (1 - size-replacing-firms) * mean [net-worth-A] of incumbent-firms
+      set new-firms-individual-price-P average-market-price
+    ]
     create-firms (number-of-firms - count firms) [
       set x-position random-pxcor * 0.9
       set y-position random-pycor * 0.9
@@ -672,16 +685,16 @@ to replace-bankrupt
       set size 1.2
       set shape "factory"
       ;-----------------
-      set production-Y ceiling mean [production-Y] of incumbent-firms
+      set production-Y new-firms-production-Y
       set labor-productivity-alpha 1
       set my-employees no-turtles
-      set minimum-wage-W-hat min [minimum-wage-W-hat] of incumbent-firms
-      set wage-offered-Wb (1 - size-replacing-firms) * mean [wage-offered-Wb] of incumbent-firms
-      set net-worth-A (1 - size-replacing-firms) * mean [net-worth-A] of incumbent-firms
+      set minimum-wage-W-hat new-firms-minimum-wage-W-hat
+      set wage-offered-Wb new-firms-wage-offered-Wb
+      set net-worth-A new-firms-net-worth-A
       set my-potential-banks no-turtles
       set my-bank no-turtles
       set inventory-S 0
-      set individual-price-P  1.26 * average-market-price
+      set individual-price-P  new-firms-individual-price-P
       ;-----------------
       set being-extorted? false
       set being-punished? false
