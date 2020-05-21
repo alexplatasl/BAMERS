@@ -818,11 +818,19 @@ to plot-wealth-of-extorters
 end
 
 to-report N-extorted-firms
-  report count firms with [being-extorted?]
+  ifelse (any? firms with [being-extorted?])[
+    report count firms with [being-extorted?]
+  ][
+    report 0
+  ]
 end
 
 to-report N-punished-firms
-  report count firms with [being-punished?]
+  ifelse(any? firms with [being-punished?])[
+    report count firms with [being-punished?]
+  ][
+    report 0
+  ]
 end
 
 to-report N-extorters
