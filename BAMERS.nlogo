@@ -796,6 +796,12 @@ to-report logarithm-of-households-consumption
   report ln-hopital consumption
 end
 
+to-report households-consumption-to-gdp-ratio
+  let output sum [production-Y * individual-price-P] of firms
+  let consumption output - sum [inventory-S] of firms
+  report consumption / nominal-GDP
+end
+
 to-report fn-unemployment-rate
   report count workers with [not employed? and time-in-jail < 1] / count workers with [time-in-jail < 1]
 end
