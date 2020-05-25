@@ -764,6 +764,14 @@ to-report nominal-GDP
   report output
 end
 
+to-report pizzo-to-gdp-ratio
+  report (sum [amount-of-pizzo] of firms / nominal-GDP)
+end
+
+to-report punish-to-gdp-ratio
+  report (sum [amount-of-punish] of firms / nominal-GDP)
+end
+
 to plot-nominal-GDP
   plot ln-hopital nominal-GDP
 end
@@ -1646,7 +1654,7 @@ propensity-to-be-extorter-epsilon
 propensity-to-be-extorter-epsilon
 0
 100
-60.0
+20.0
 5
 1
 %
@@ -1707,19 +1715,19 @@ PLOT
 505
 1775
 625
-Sum of pizzo & punish
+Pizzo & punish to GDP ratio
 Time
 NIL
 0.0
 4.0
 0.0
-4.0
+0.05
 true
 true
 "" ""
 PENS
-"pizzo" 1.0 0 -13345367 true "" "set-plot-x-range 0 (ticks + 5)\nplot sum [amount-of-pizzo] of firms"
-"punish" 1.0 0 -5298144 true "" "plot sum [amount-of-punish] of firms"
+"pizzo" 1.0 0 -13345367 true "" "set-plot-x-range 0 (ticks + 5)\nplot pizzo-to-gdp-ratio"
+"punish" 1.0 0 -5298144 true "" "plot punish-to-gdp-ratio"
 
 SLIDER
 270
@@ -1730,7 +1738,7 @@ probability-of-being-caught-lambda
 probability-of-being-caught-lambda
 0
 100
-60.0
+30.0
 5
 1
 %
@@ -2757,10 +2765,8 @@ NetLogo 6.1.1
     <metric>mean [wealth] of workers</metric>
     <metric>gini-index</metric>
     <metric>skewness-of-wealth</metric>
-    <metric>count workers with [extorter?]</metric>
-    <metric>count firms with [being-extorted?]</metric>
-    <metric>sum [amount-of-pizzo] of firms</metric>
-    <metric>sum [amount-of-punish] of firms</metric>
+    <metric>pizzo-to-gdp-ratio</metric>
+    <metric>punish-to-gdp-ratio</metric>
     <metric>mean [net-worth-A] of fn-incumbent-firms</metric>
     <metric>mean [production-Y] of fn-incumbent-firms</metric>
     <metric>mean [propensity-to-consume-c] of workers</metric>
