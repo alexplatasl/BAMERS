@@ -1121,10 +1121,10 @@ trials
 HORIZONTAL
 
 PLOT
-708
-10
-974
-130
+970
+35
+1236
+155
 Unemployment rate
 Time
 NIL
@@ -1201,10 +1201,10 @@ NIL
 HORIZONTAL
 
 PLOT
-977
-10
-1243
-130
+970
+275
+1236
+395
 Net worth distribution
 log money
 freq
@@ -1219,11 +1219,11 @@ PENS
 "default" 1.0 1 -16777216 true "" "set-histogram-num-bars sqrt count firms\nset-plot-y-range 0 ceiling sqrt count firms\nset-plot-x-range floor ln-hopital min [net-worth-A] of fn-incumbent-firms ceiling ln-hopital max [net-worth-A] of fn-incumbent-firms\nhistogram map ln-hopital [net-worth-A] of fn-incumbent-firms"
 
 PLOT
-1246
-10
-1512
-130
-log (Net worth) of firms
+705
+275
+971
+395
+log Net worth of firms
 Time
 NIL
 0.0
@@ -1239,10 +1239,10 @@ PENS
 "max" 1.0 2 -13840069 true "set-plot-pen-mode 2" "plot ln-hopital max [net-worth-A] of firms"
 
 PLOT
-708
-133
-974
-253
+970
+155
+1236
+275
 Propensity to consume
 Time
 NIL
@@ -1259,10 +1259,10 @@ PENS
 "max" 1.0 0 -13345367 true "" "plot max [propensity-to-consume-c] of workers"
 
 PLOT
-977
-133
-1243
-253
+1500
+35
+1766
+155
 Time scale inflation
 Time
 %
@@ -1278,10 +1278,10 @@ PENS
 "pen-1" 1.0 2 -5987164 true "" "plot 0"
 
 PLOT
-1246
-133
-1512
-253
+1235
+35
+1501
+155
 Annualized inflation
 Year
 %
@@ -1322,11 +1322,11 @@ NIL
 HORIZONTAL
 
 PLOT
-708
-256
-974
-376
-Ln real GDP
+705
+35
+971
+155
+Real GDP
 Time
 NIL
 0.0
@@ -1337,31 +1337,31 @@ true
 false
 "" ""
 PENS
-"Nom." 1.0 2 -12030287 true "" "set-plot-x-range 0 (ticks + 5)\nplot-real-GDP"
+"Nom." 1.0 2 -12030287 true "" "set-plot-x-range 0 (ticks + 5)\nplot real-GDP"
 
 PLOT
-977
-256
-1243
-376
-Ln of consumption
+705
+155
+971
+275
+Consumption to GDP ratio
 Time
 NIL
 0.0
 10.0
 0.0
-10.0
+1.0
 true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nplot logarithm-of-households-consumption"
+"default" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nplot households-consumption-to-gdp-ratio"
 
 PLOT
-1246
-256
-1512
-376
+970
+395
+1236
+515
 Ln Price of firms
 Time
 NIL
@@ -1488,10 +1488,10 @@ TEXTBOX
 1
 
 PLOT
-977
-380
-1243
-500
+1500
+515
+1766
+635
 Wealth distribution
 log wealth
 freq
@@ -1506,10 +1506,10 @@ PENS
 "default" 1.0 1 -16777216 true "" "set-histogram-num-bars sqrt count workers\nset-plot-y-range 0 ceiling sqrt count workers\nset-plot-x-range floor ln-hopital min [wealth] of workers ceiling ln-hopital max [wealth] of workers\nhistogram map ln-hopital [wealth] of workers with [wealth > 0]"
 
 PLOT
-1246
-381
-1513
-501
+1235
+395
+1500
+515
 Size of firms
 log Production
 freq
@@ -1524,10 +1524,10 @@ PENS
 "default" 1.0 1 -16777216 true "" "set-histogram-num-bars sqrt count firms\nset-plot-y-range 0 ceiling sqrt count firms\nset-plot-x-range floor ln-hopital min [production-Y] of fn-incumbent-firms ceiling ln-hopital max [production-Y] of fn-incumbent-firms\nplot-size-of-firms"
 
 PLOT
-1516
-10
-1776
-130
+1235
+275
+1500
+395
 Production of firms
 Time
 Quantity
@@ -1544,10 +1544,10 @@ PENS
 "min" 1.0 0 -2674135 true "" "plot min [production-Y] of fn-incumbent-firms"
 
 PLOT
-1516
-133
-1776
-253
+1500
+275
+1765
+395
 Desired production
 Time
 Quantity
@@ -1562,13 +1562,12 @@ PENS
 "mean" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nset-plot-y-range 0 ceiling (max (list 1 [desired-production-Yd] of firms))\nplot mean [desired-production-Yd] of firms"
 "max" 1.0 0 -13840069 true "" "plot max [desired-production-Yd] of firms"
 "min" 1.0 0 -2674135 true "" "plot min [desired-production-Yd] of firms"
-"median" 1.0 0 -11053225 true "" "plot median [desired-production-Yd] of firms"
 
 PLOT
-1516
-257
-1776
-377
+705
+515
+970
+635
 Contractual interest rate
 Time
 %
@@ -1583,10 +1582,10 @@ PENS
 "mean" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nplot 100 * mean [my-interest-rate] of firms"
 
 PLOT
-1516
-381
-1776
-501
+1235
+515
+1500
+635
 Wealth of workers
 Time
 Ln
@@ -1602,10 +1601,10 @@ PENS
 "extorter" 1.0 0 -5298144 true "" "plot-wealth-of-extorters"
 
 PLOT
-710
-505
-975
-625
+705
+395
+970
+515
 Inventory-S
 Time
 Ln
@@ -1622,17 +1621,17 @@ PENS
 "min" 1.0 0 -13345367 true "" "plot ln-hopital min [inventory-S] of firms"
 
 PLOT
-975
-505
-1245
-625
+970
+515
+1235
+635
 Banks patrimonial base
 Time
 Ln
 0.0
 10.0
 0.0
-9.0
+10.0
 true
 true
 "" ""
@@ -1682,11 +1681,11 @@ trials
 HORIZONTAL
 
 PLOT
-1245
-505
-1515
-625
-Extorters & Extorted
+705
+635
+970
+755
+Extorters
 Time
 NIL
 0.0
@@ -1697,9 +1696,8 @@ true
 true
 "" ""
 PENS
-"Extorters" 1.0 0 -5298144 true "" "set-plot-x-range 0 (ticks + 5)\nplot count workers with [extorter?]"
-"Extorted" 1.0 0 -14070903 true "" "plot count firms with [being-extorted?]"
-"In-jail" 1.0 0 -955883 true "" "plot count workers with [time-in-jail > 0]"
+"Active" 1.0 0 -5298144 true "" "set-plot-x-range 0 (ticks + 5)\nplot N-extorters"
+"In-jail" 1.0 0 -12412731 true "" "plot N-extorters-in-jail"
 
 SLIDER
 25
@@ -1717,10 +1715,10 @@ proportion-of-pizzo
 HORIZONTAL
 
 PLOT
-1515
-505
-1775
-625
+1235
+635
+1500
+755
 Pizzo & punish to GDP ratio
 Time
 NIL
@@ -1751,10 +1749,10 @@ probability-of-being-caught-lambda
 HORIZONTAL
 
 PLOT
-709
-379
-974
-499
+1500
+395
+1765
+515
 wage-offered-Wb
 Time
 NIL
@@ -1831,10 +1829,10 @@ TEXTBOX
 1
 
 PLOT
-710
-630
-975
-750
+1235
+155
+1500
+275
 Lorenz curve of workers
 Pop %
 Wealth %
@@ -1850,10 +1848,10 @@ PENS
 "Equal" 100.0 0 -13840069 true "plot 0\nplot 100" ""
 
 PLOT
-975
-630
-1245
-750
+1500
+155
+1765
+275
 Gini index
 Time
 Gini
@@ -2017,7 +2015,7 @@ rejection-threshold
 rejection-threshold
 0
 100
-45.0
+15.0
 15
 1
 %
@@ -2078,6 +2076,25 @@ TEXTBOX
 12
 5.0
 1
+
+PLOT
+970
+635
+1235
+755
+Proportion of firms being...
+NIL
+NIL
+0.0
+10.0
+0.0
+1.0
+true
+true
+"" ""
+PENS
+"Extorted" 1.0 0 -955883 true "" "set-plot-x-range 0 (ticks + 5)\nplot N-extorted-firms / count firms"
+"Punished" 1.0 0 -5298144 true "" "plot N-punished-firms / count firms"
 
 @#$#@#$#@
 Overview
