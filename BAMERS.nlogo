@@ -1122,9 +1122,9 @@ HORIZONTAL
 
 PLOT
 970
-35
+30
 1236
-155
+150
 Unemployment rate
 Time
 NIL
@@ -1202,9 +1202,9 @@ HORIZONTAL
 
 PLOT
 970
-295
+290
 1236
-415
+410
 Net worth distribution
 log money
 freq
@@ -1220,12 +1220,12 @@ PENS
 
 PLOT
 705
-295
+290
 971
-415
-log Net worth of firms
+410
+Net worth of firms
 Time
-NIL
+Ln
 0.0
 10.0
 0.0
@@ -1240,9 +1240,9 @@ PENS
 
 PLOT
 970
-155
+150
 1236
-275
+270
 Propensity to consume
 Time
 NIL
@@ -1260,9 +1260,9 @@ PENS
 
 PLOT
 1500
-35
+30
 1766
-155
+150
 Time scale inflation
 Time
 %
@@ -1279,9 +1279,9 @@ PENS
 
 PLOT
 1235
-35
+30
 1501
-155
+150
 Annualized inflation
 Year
 %
@@ -1323,9 +1323,9 @@ HORIZONTAL
 
 PLOT
 705
-35
+30
 971
-155
+150
 Real GDP
 Time
 NIL
@@ -1341,9 +1341,9 @@ PENS
 
 PLOT
 705
-155
+150
 971
-275
+270
 Consumption to GDP ratio
 Time
 NIL
@@ -1359,12 +1359,12 @@ PENS
 
 PLOT
 970
-415
+410
 1236
-535
-Ln Price of firms
+530
+Price of firms
 Time
-NIL
+Ln
 0.0
 10.0
 0.0
@@ -1489,9 +1489,9 @@ TEXTBOX
 
 PLOT
 1500
-535
+530
 1766
-655
+650
 Wealth distribution
 log wealth
 freq
@@ -1507,9 +1507,9 @@ PENS
 
 PLOT
 1235
-415
+410
 1500
-535
+530
 Size of firms
 log Production
 freq
@@ -1525,9 +1525,9 @@ PENS
 
 PLOT
 1235
-295
+290
 1500
-415
+410
 Production of firms
 Time
 Quantity
@@ -1545,9 +1545,9 @@ PENS
 
 PLOT
 1500
-295
+290
 1765
-415
+410
 Desired production
 Time
 Quantity
@@ -1565,9 +1565,9 @@ PENS
 
 PLOT
 705
-535
+530
 970
-655
+650
 Contractual interest rate
 Time
 %
@@ -1583,9 +1583,9 @@ PENS
 
 PLOT
 1235
-535
+530
 1500
-655
+650
 Wealth of workers
 Time
 Ln
@@ -1602,9 +1602,9 @@ PENS
 
 PLOT
 705
-415
+410
 970
-535
+530
 Inventory-S
 Time
 Ln
@@ -1622,9 +1622,9 @@ PENS
 
 PLOT
 970
-535
+530
 1235
-655
+650
 Banks patrimonial base
 Time
 Ln
@@ -1682,9 +1682,9 @@ HORIZONTAL
 
 PLOT
 705
-680
+670
 970
-800
+790
 % of Workers being extortionits...
 Time
 %
@@ -1716,9 +1716,9 @@ HORIZONTAL
 
 PLOT
 1235
-680
+670
 1500
-800
+790
 Pizzo & punish to GDP ratio
 Time
 NIL
@@ -1750,12 +1750,12 @@ HORIZONTAL
 
 PLOT
 1500
-415
+410
 1765
-535
-wage-offered-Wb
+530
+Wage offered Wb
 Time
-NIL
+Ln
 0.0
 10.0
 0.0
@@ -1830,9 +1830,9 @@ TEXTBOX
 
 PLOT
 1235
-155
+150
 1500
-275
+270
 Lorenz curve of workers
 Pop %
 Wealth %
@@ -1849,12 +1849,12 @@ PENS
 
 PLOT
 1500
-155
+150
 1765
-275
+270
 Gini index
 Time
-Gini
+Index
 0.0
 10.0
 0.0
@@ -2079,9 +2079,9 @@ TEXTBOX
 
 PLOT
 970
-680
+670
 1235
-800
+790
 % of Firms being...
 Time
 %
@@ -2108,9 +2108,9 @@ Aggregate economic variables
 
 TEXTBOX
 710
-275
+270
 860
-300
+295
 Agent variables
 16
 0.0
@@ -2118,9 +2118,9 @@ Agent variables
 
 TEXTBOX
 710
-660
+650
 935
-678
+668
 Extortion related variables
 16
 0.0
