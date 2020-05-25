@@ -1667,9 +1667,9 @@ HORIZONTAL
 
 SLIDER
 270
-505
+540
 575
-538
+573
 firms-to-extort-X
 firms-to-extort-X
 1
@@ -1735,9 +1735,9 @@ PENS
 
 SLIDER
 270
+505
 575
-575
-608
+538
 probability-of-being-caught-lambda
 probability-of-being-caught-lambda
 0
@@ -1790,9 +1790,9 @@ TEXTBOX
 
 TEXTBOX
 585
-520
+555
 635
-538
+573
 1 trial
 12
 5.0
@@ -1810,9 +1810,9 @@ TEXTBOX
 
 TEXTBOX
 585
-555
+590
 615
-573
+608
 15%
 12
 5.0
@@ -1820,9 +1820,9 @@ TEXTBOX
 
 TEXTBOX
 585
-590
+520
 615
-608
+538
 30%
 12
 5.0
@@ -1877,9 +1877,9 @@ Pizzo payment parameters
 
 SLIDER
 270
-610
+645
 575
-643
+678
 percent-transfer-fondo
 percent-transfer-fondo
 0
@@ -1892,9 +1892,9 @@ HORIZONTAL
 
 TEXTBOX
 585
+660
 625
-625
-643
+678
 50%
 12
 5.0
@@ -1997,9 +1997,9 @@ prop
 
 SWITCH
 270
-680
+715
 472
-713
+748
 proportional-refund?
 proportional-refund?
 0
@@ -2008,9 +2008,9 @@ proportional-refund?
 
 SLIDER
 270
-540
 575
-573
+575
+608
 rejection-threshold
 rejection-threshold
 0
@@ -2023,9 +2023,9 @@ HORIZONTAL
 
 SWITCH
 270
-715
+750
 472
-748
+783
 quarterly-time-scale?
 quarterly-time-scale?
 1
@@ -2034,9 +2034,9 @@ quarterly-time-scale?
 
 TEXTBOX
 475
-690
+725
 625
-708
+743
 Otherwise, first to come
 12
 5.0
@@ -2044,9 +2044,9 @@ Otherwise, first to come
 
 TEXTBOX
 475
-725
+760
 635
-751
+786
 Otherwise, monthly scale
 12
 5.0
@@ -2054,9 +2054,9 @@ Otherwise, monthly scale
 
 SLIDER
 270
-645
+680
 575
-678
+713
 proportion-of-punish
 proportion-of-punish
 25
@@ -2069,9 +2069,9 @@ HORIZONTAL
 
 TEXTBOX
 585
-660
+695
 615
-678
+713
 25%
 12
 5.0
@@ -2128,9 +2128,9 @@ Extortion related variables
 
 SLIDER
 270
+610
 575
-575
-608
+643
 closest-observable-firms
 closest-observable-firms
 1
@@ -2143,9 +2143,9 @@ HORIZONTAL
 
 TEXTBOX
 585
-585
+620
 630
-603
+638
 3 firms
 11
 5.0
