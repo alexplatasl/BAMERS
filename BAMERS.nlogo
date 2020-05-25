@@ -716,165 +716,7 @@ to replace-bankrupt
   ]
 end
 
-; utilities
-
-to-report average-market-price
-  report mean [individual-price-P] of firms
-end
-
-to-report fn-tanh [a]
-  report ifelse-value (a < 354.391)[(exp (2 * a) - 1) / (exp (2 * a) + 1)][0.135335283]
-end
-
-to-report fn-minimum-wage-W-hat
-  let currently-minimum-w min [minimum-wage-W-hat] of firms
-  report annualized-inflation * currently-minimum-w
-end
-
-to-report interest-rate-policy-rbar
-  report 0.07
-end
-
-to-report fn-incumbent-firms
-  let lower count firms * 0.05
-  let upper count firms * 0.95
-  let ordered-firms sort-on [net-worth-A] firms
-  let list-incumbent-firms sublist ordered-firms lower upper
-  report (turtle-set list-incumbent-firms)
-end
-
-to-report fn-truncated-normal [ m sd ]
-  let normal-value random-normal m sd
-  report ifelse-value (normal-value > (m - sd)) [normal-value][max list 1 (m - sd)]
-end
-
-to-report lower-quartile [ xs ]
-  let med median xs
-  let lower filter [ x -> x < med ] xs
-  report ifelse-value (empty? lower) [ med ] [ median lower ]
-end
-
-to-report tiempo
-  report timer
-end
-
-; observation
-to-report nominal-GDP
-  let output sum [production-Y * individual-price-P] of firms
-  report output
-end
-
-to-report pizzo-to-gdp-ratio
-  report (sum [amount-of-pizzo] of firms / nominal-GDP)
-end
-
-to-report punish-to-gdp-ratio
-  report (sum [amount-of-punish] of firms / nominal-GDP)
-end
-
-to plot-nominal-GDP
-  plot ln-hopital nominal-GDP
-end
-
-to-report CPI
-  let base base-price
-  let current array:item quarters-average-price (ticks mod (ifelse-value (quarterly-time-scale?)[4][12]))
-  report (current / base) * 100
-end
-
-to-report real-GDP
-  report nominal-GDP / CPI
-end
-
-to plot-real-GDP
-  plot ln-hopital real-GDP
-end
-
-to-report logarithm-of-households-consumption
-  let output sum [production-Y * individual-price-P] of firms
-  let consumption output - sum [inventory-S] of firms
-  report ln-hopital consumption
-end
-
-to-report households-consumption-to-gdp-ratio
-  let output sum [production-Y * individual-price-P] of firms
-  let consumption output - sum [inventory-S] of firms
-  report consumption / nominal-GDP
-end
-
-to-report fn-unemployment-rate
-  report count workers with [not employed? and time-in-jail < 1] / count workers with [time-in-jail < 1]
-end
-
-to plot-unemployment-rate
-  plot fn-unemployment-rate
-end
-
-to-report quarterly-inflation
-  let q-inflation array:item quarters-inflation (ticks mod (ifelse-value (quarterly-time-scale?)[4][12]))
-  report q-inflation
-end
-
-to-report annualized-inflation
-  report reduce * map [i -> (i / 100) + 1] array:to-list quarters-inflation
-end
-
-to plot-annualized-inflation
-  plot (annualized-inflation - 1) * 100
-end
-
-to-report ln-hopital [number]
-  report ifelse-value (number > 0)[ln number][0]
-end
-
-to plot-size-of-firms
-  histogram map ln-hopital [production-Y] of fn-incumbent-firms
-end
-
-;; Reporters for extortion variables
-to-report fn-wealth-of-extorters
-  ifelse (any? workers with [extorter?])[
-    report ln-hopital mean [wealth] of workers with [extorter?]
-  ][
-    report 0
-  ]
-end
-
-to plot-wealth-of-extorters
-  plot fn-wealth-of-extorters
-end
-
-to-report N-extorted-firms
-  ifelse (any? firms with [being-extorted?])[
-    report count firms with [being-extorted?]
-  ][
-    report 0
-  ]
-end
-
-to-report N-punished-firms
-  ifelse(any? firms with [being-punished?])[
-    report count firms with [being-punished?]
-  ][
-    report 0
-  ]
-end
-
-to-report N-extorters
-  report count workers with [extorter? and time-in-jail < 1]
-end
-
-to-report N-extorters-in-jail
-  report count workers with [time-in-jail > 0]
-end
-
-to-report base-price
-  report 1.5
-end
-
-to-report base-savings
-  report 2
-end
+;;;;;;;;;; utilities ;;;;;;;;;;
 
 ;; this procedure recomputes the value of gini-index-reserve
 ;; and the points in lorenz-points for the Lorenz and Gini-Index plots
@@ -926,8 +768,63 @@ to-report skewness-of-wealth
   ]
 end
 
-to-report avg-propensity-to-consume
-  report mean [propensity-to-consume-c] of workers
+to-report fn-truncated-normal [ m sd ]
+  let normal-value random-normal m sd
+  report ifelse-value (normal-value > (m - sd)) [normal-value][max list 1 (m - sd)]
+end
+
+to-report lower-quartile [ xs ]
+  let med median xs
+  let lower filter [ x -> x < med ] xs
+  report ifelse-value (empty? lower) [ med ] [ median lower ]
+end
+
+to-report tiempo
+  report timer
+end
+
+to-report CPI
+  let base base-price
+  let current array:item quarters-average-price (ticks mod (ifelse-value (quarterly-time-scale?)[4][12]))
+  report (current / base) * 100
+end
+
+to-report ln-hopital [number]
+  report ifelse-value (number > 0)[ln number][0]
+end
+
+to-report base-price
+  report 1.5
+end
+
+to-report base-savings
+  report 2
+end
+
+;;;;;;;;;; firm related reporters ;;;;;;;;;;
+to-report average-market-price
+  report mean [individual-price-P] of firms
+end
+
+to-report fn-minimum-wage-W-hat
+  let currently-minimum-w min [minimum-wage-W-hat] of firms
+  report annualized-inflation * currently-minimum-w
+end
+
+to-report fn-incumbent-firms
+  let lower count firms * 0.05
+  let upper count firms * 0.95
+  let ordered-firms sort-on [net-worth-A] firms
+  let list-incumbent-firms sublist ordered-firms lower upper
+  report (turtle-set list-incumbent-firms)
+end
+
+to-report avg-firm-production
+  report mean [production-Y] of fn-incumbent-firms
+end
+
+to plot-size-of-firms
+  histogram map ln-hopital [production-Y] of fn-incumbent-firms
 end
 
 to-report avg-interest-rate
@@ -942,16 +839,136 @@ to-report avg-net-worth
   report mean [net-worth-A] of fn-incumbent-firms
 end
 
-to-report average-real-interest-rate
-
+;;;;;;;;;; regular worker related reporters ;;;;;;;;;;
+to-report fn-tanh [a]
+  report ifelse-value (a < 354.391)[(exp (2 * a) - 1) / (exp (2 * a) + 1)][0.135335283]
 end
 
-to-report number-of-firms-which-go-bankrupt
-
+to-report avg-propensity-to-consume
+  report mean [propensity-to-consume-c] of workers
 end
 
-to-report vacancy-rate
+to-report fn-wealth-of-regular-worker
+  ifelse (any? workers with [not extorter?])[
+    report ln-hopital mean [wealth] of workers with [not extorter?]
+  ][
+    report 0
+  ]
+end
 
+;;;;;;;;;; bank related reporters ;;;;;;;;;;
+to-report interest-rate-policy-rbar
+  report 0.07
+end
+
+to-report patrimonial-bank-to-gdp-ratio
+  let bank-capital sum [patrimonial-base-E] of banks
+  report bank-capital / nominal-GDP
+end
+
+;;;;;;;;;; economic variables reporters ;;;;;;;;;;
+to-report nominal-GDP
+  let output sum [production-Y * individual-price-P] of firms
+  report output
+end
+
+to plot-nominal-GDP
+  plot ln-hopital nominal-GDP
+end
+
+to-report real-GDP
+  report nominal-GDP / CPI
+end
+
+to plot-real-GDP
+  plot ln-hopital real-GDP
+end
+
+to-report fn-unemployment-rate
+  report count workers with [not employed? and time-in-jail < 1] / count workers with [time-in-jail < 1]
+end
+
+to plot-unemployment-rate
+  plot fn-unemployment-rate
+end
+
+to-report logarithm-of-households-consumption
+  let output sum [production-Y * individual-price-P] of firms
+  let consumption output - sum [inventory-S] of firms
+  report ln-hopital consumption
+end
+
+to-report households-consumption-to-gdp-ratio
+  let output sum [production-Y * individual-price-P] of firms
+  let consumption output - sum [inventory-S] of firms
+  report consumption / nominal-GDP
+end
+
+to-report inventory-to-gdp-ratio
+  let stock sum [inventory-S] of firms
+  report stock / nominal-GDP
+end
+
+to-report quarterly-inflation
+  let q-inflation array:item quarters-inflation (ticks mod (ifelse-value (quarterly-time-scale?)[4][12]))
+  report q-inflation
+end
+
+to-report annualized-inflation
+  report reduce * map [i -> (i / 100) + 1] array:to-list quarters-inflation
+end
+
+to-report yearly-inflation
+  report (annualized-inflation - 1) * 100
+end
+
+to plot-annualized-inflation
+  plot yearly-inflation
+end
+
+;;;;;;;;;; Reporters for extortion variables ;;;;;;;;;;
+to-report fn-wealth-of-extorters
+  ifelse (any? workers with [extorter?])[
+    report ln-hopital mean [wealth] of workers with [extorter?]
+  ][
+    report 0
+  ]
+end
+
+to plot-wealth-of-extorters
+  plot fn-wealth-of-extorters
+end
+
+to-report N-extorted-firms
+  ifelse (any? firms with [being-extorted?])[
+    report count firms with [being-extorted?]
+  ][
+    report 0
+  ]
+end
+
+to-report N-punished-firms
+  ifelse(any? firms with [being-punished?])[
+    report count firms with [being-punished?]
+  ][
+    report 0
+  ]
+end
+
+to-report N-extorters
+  report count workers with [extorter? and time-in-jail < 1]
+end
+
+to-report N-extorters-in-jail
+  report count workers with [time-in-jail > 0]
+end
+
+to-report pizzo-to-gdp-ratio
+  report (sum [amount-of-pizzo] of firms / nominal-GDP)
+end
+
+to-report punish-to-gdp-ratio
+  report (sum [amount-of-punish] of firms / nominal-GDP)
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -1685,7 +1702,7 @@ PLOT
 670
 970
 790
-% of Workers being extortionits...
+% of Workers being extortionists
 Time
 %
 0.0
@@ -2839,36 +2856,41 @@ NetLogo 6.1.1
   <experiment name="thesis-extortion" repetitions="20" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
+    <metric>real-GDP</metric>
     <metric>fn-unemployment-rate</metric>
-    <metric>mean [wealth] of workers</metric>
+    <metric>quarterly-inflation</metric>
+    <metric>yearly-inflation</metric>
     <metric>gini-index</metric>
     <metric>skewness-of-wealth</metric>
-    <metric>pizzo-to-gdp-ratio</metric>
-    <metric>punish-to-gdp-ratio</metric>
-    <metric>mean [net-worth-A] of fn-incumbent-firms</metric>
-    <metric>mean [production-Y] of fn-incumbent-firms</metric>
-    <metric>mean [propensity-to-consume-c] of workers</metric>
-    <metric>quarterly-inflation</metric>
-    <metric>(annualized-inflation - 1) * 100</metric>
-    <metric>real-GDP</metric>
-    <metric>logarithm-of-households-consumption</metric>
+    <metric>fn-wealth-of-regular-worker</metric>
+    <metric>households-consumption-to-gdp-ratio</metric>
+    <metric>avg-propensity-to-consume</metric>
+    <metric>avg-net-worth</metric>
+    <metric>avg-firm-production</metric>
     <metric>ln average-market-price</metric>
-    <metric>100 * mean [my-interest-rate] of firms</metric>
-    <metric>ln mean [wage-offered-Wb] of firms</metric>
-    <metric>ln-hopital mean [inventory-S] of firms</metric>
-    <metric>ln-hopital mean [patrimonial-base-E] of banks</metric>
+    <metric>avg-interest-rate</metric>
+    <metric>avg-wage-offered</metric>
+    <metric>inventory-to-gdp-ratio</metric>
+    <metric>patrimonial-bank-to-gdp-ratio</metric>
     <metric>fn-wealth-of-extorters</metric>
     <metric>N-extorted-firms</metric>
     <metric>N-punished-firms</metric>
     <metric>N-extorters</metric>
     <metric>N-extorters-in-jail</metric>
+    <metric>pizzo-to-gdp-ratio</metric>
+    <metric>punish-to-gdp-ratio</metric>
+    <steppedValueSet variable="propensity-to-be-extorter-epsilon" first="0" step="5" last="100"/>
+    <steppedValueSet variable="probability-of-being-caught-lambda" first="0" step="5" last="100"/>
+    <enumeratedValueSet variable="rejection-threshold">
+      <value value="15"/>
+      <value value="45"/>
+    </enumeratedValueSet>
     <enumeratedValueSet variable="type-of-search">
       <value value="&quot;random-search&quot;"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="type-of-pizzo">
       <value value="&quot;proportion&quot;"/>
     </enumeratedValueSet>
-    <steppedValueSet variable="propensity-to-be-extorter-epsilon" first="0" step="5" last="100"/>
     <enumeratedValueSet variable="proportion-of-pizzo">
       <value value="10"/>
     </enumeratedValueSet>
@@ -2878,11 +2900,6 @@ NetLogo 6.1.1
     <enumeratedValueSet variable="quarterly-time-scale?">
       <value value="false"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="rejection-threshold">
-      <value value="15"/>
-      <value value="45"/>
-    </enumeratedValueSet>
-    <steppedValueSet variable="probability-of-being-caught-lambda" first="0" step="5" last="100"/>
     <enumeratedValueSet variable="percent-transfer-fondo">
       <value value="50"/>
     </enumeratedValueSet>
