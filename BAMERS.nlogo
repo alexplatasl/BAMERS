@@ -1202,9 +1202,9 @@ HORIZONTAL
 
 PLOT
 970
-275
+295
 1236
-395
+415
 Net worth distribution
 log money
 freq
@@ -1220,9 +1220,9 @@ PENS
 
 PLOT
 705
-275
+295
 971
-395
+415
 log Net worth of firms
 Time
 NIL
@@ -1359,9 +1359,9 @@ PENS
 
 PLOT
 970
-395
+415
 1236
-515
+535
 Ln Price of firms
 Time
 NIL
@@ -1489,9 +1489,9 @@ TEXTBOX
 
 PLOT
 1500
-515
+535
 1766
-635
+655
 Wealth distribution
 log wealth
 freq
@@ -1507,9 +1507,9 @@ PENS
 
 PLOT
 1235
-395
+415
 1500
-515
+535
 Size of firms
 log Production
 freq
@@ -1525,9 +1525,9 @@ PENS
 
 PLOT
 1235
-275
+295
 1500
-395
+415
 Production of firms
 Time
 Quantity
@@ -1545,9 +1545,9 @@ PENS
 
 PLOT
 1500
-275
+295
 1765
-395
+415
 Desired production
 Time
 Quantity
@@ -1565,9 +1565,9 @@ PENS
 
 PLOT
 705
-515
+535
 970
-635
+655
 Contractual interest rate
 Time
 %
@@ -1583,9 +1583,9 @@ PENS
 
 PLOT
 1235
-515
+535
 1500
-635
+655
 Wealth of workers
 Time
 Ln
@@ -1602,9 +1602,9 @@ PENS
 
 PLOT
 705
-395
+415
 970
-515
+535
 Inventory-S
 Time
 Ln
@@ -1622,9 +1622,9 @@ PENS
 
 PLOT
 970
-515
+535
 1235
-635
+655
 Banks patrimonial base
 Time
 Ln
@@ -1682,22 +1682,22 @@ HORIZONTAL
 
 PLOT
 705
-635
+680
 970
-755
-Extorters
+800
+% of Workers being extortionits...
 Time
-NIL
+%
 0.0
 1.0
 0.0
-1.0
+100.0
 true
 true
 "" ""
 PENS
-"Active" 1.0 0 -5298144 true "" "set-plot-x-range 0 (ticks + 5)\nplot N-extorters"
-"In-jail" 1.0 0 -12412731 true "" "plot N-extorters-in-jail"
+"Active" 1.0 0 -5298144 true "" "set-plot-x-range 0 (ticks + 5)\nplot (N-extorters / count workers) * 100"
+"In-jail" 1.0 0 -12412731 true "" "plot (N-extorters-in-jail / count workers) * 100"
 
 SLIDER
 25
@@ -1716,9 +1716,9 @@ HORIZONTAL
 
 PLOT
 1235
-635
+680
 1500
-755
+800
 Pizzo & punish to GDP ratio
 Time
 NIL
@@ -1750,9 +1750,9 @@ HORIZONTAL
 
 PLOT
 1500
-395
+415
 1765
-515
+535
 wage-offered-Wb
 Time
 NIL
@@ -2079,22 +2079,52 @@ TEXTBOX
 
 PLOT
 970
-635
+680
 1235
-755
-Proportion of firms being...
-NIL
-NIL
+800
+% of Firms being...
+Time
+%
 0.0
 10.0
 0.0
-1.0
+100.0
 true
 true
 "" ""
 PENS
-"Extorted" 1.0 0 -955883 true "" "set-plot-x-range 0 (ticks + 5)\nplot N-extorted-firms / count firms"
-"Punished" 1.0 0 -5298144 true "" "plot N-punished-firms / count firms"
+"Extorted" 1.0 0 -955883 true "" "set-plot-x-range 0 (ticks + 5)\nplot (N-extorted-firms / count firms) * 100\n"
+"Punished" 1.0 0 -5298144 true "" "plot (N-punished-firms / count firms) * 100"
+
+TEXTBOX
+710
+10
+1040
+31
+Aggregate economic variables
+16
+0.0
+1
+
+TEXTBOX
+710
+275
+860
+300
+Agent variables
+16
+0.0
+1
+
+TEXTBOX
+710
+660
+935
+678
+Extortion related variables
+16
+0.0
+1
 
 @#$#@#$#@
 Overview
