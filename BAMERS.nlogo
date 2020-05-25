@@ -848,12 +848,25 @@ to-report avg-propensity-to-consume
   report mean [propensity-to-consume-c] of workers
 end
 
+to-report avg-propensity-to-consume-regular-worker
+  ifelse (any? workers with [not extorter?])[
+    report mean [propensity-to-consume-c] of workers with [not extorter?]
+  ][
+    report 0
+  ]
+end
+
 to-report fn-wealth-of-regular-worker
   ifelse (any? workers with [not extorter?])[
     report ln-hopital mean [wealth] of workers with [not extorter?]
   ][
     report 0
   ]
+end
+
+to-report wealth-of-regular-worker-to-gdp-ratio
+  let sum-wealth sum [wealth] of workers with [not extorter?]
+  report sum-wealth / nominal-GDP
 end
 
 ;;;;;;;;;; bank related reporters ;;;;;;;;;;
@@ -935,8 +948,9 @@ to-report fn-wealth-of-extorters
   ]
 end
 
-to plot-wealth-of-extorters
-  plot fn-wealth-of-extorters
+to-report wealth-of-extorters-to-gdp-ratio
+  let sum-wealth sum [wealth] of workers with [extorter?]
+  report sum-wealth / nominal-GDP
 end
 
 to-report N-extorted-firms
@@ -969,6 +983,14 @@ end
 
 to-report punish-to-gdp-ratio
   report (sum [amount-of-punish] of firms / nominal-GDP)
+end
+
+to-report avg-propensity-to-consume-extorter
+  ifelse (any? workers with [extorter?])[
+    report mean [propensity-to-consume-c] of workers with [extorter?]
+  ][
+    report 0
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -1310,7 +1332,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "set-plot-x-range max list 0 (ceiling (ticks / (ifelse-value (quarterly-time-scale?)[4][12])) - 125) ceiling (ticks / (ifelse-value (quarterly-time-scale?)[4][12])) + 1\nset-plot-y-range -2 6\nif (ticks > 0 and ticks mod (ifelse-value (quarterly-time-scale?)[4][12]) = 0 )[\nplot-annualized-inflation]"
+"default" 1.0 0 -16777216 true "" "set-plot-x-range max list 0 (ceiling (ticks / (ifelse-value (quarterly-time-scale?)[4][12])) - 125) ceiling (ticks / (ifelse-value (quarterly-time-scale?)[4][12])) + 1\nif (ticks > 0 and ticks mod (ifelse-value (quarterly-time-scale?)[4][12]) = 0 )[\nplot-annualized-inflation]"
 "pen-1" 1.0 0 -7500403 true "" "set-plot-x-range max list 0 (ceiling (ticks / (ifelse-value (quarterly-time-scale?)[4][12])) - 125) ceiling (ticks / (ifelse-value (quarterly-time-scale?)[4][12])) + 1\nif (ticks > 0 and ticks mod (ifelse-value (quarterly-time-scale?)[4][12]) = 0 )[plot 0]"
 
 TEXTBOX
@@ -1354,7 +1376,7 @@ true
 false
 "" ""
 PENS
-"Nom." 1.0 2 -12030287 true "" "set-plot-x-range 0 (ticks + 5)\nplot real-GDP"
+"Nom." 1.0 0 -12030287 true "" "set-plot-x-range 0 (ticks + 5)\nplot real-GDP"
 
 PLOT
 705
@@ -1509,7 +1531,7 @@ PLOT
 530
 1766
 650
-Wealth distribution
+Wealth distribution of regular worker
 log wealth
 freq
 0.0
@@ -1520,7 +1542,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 1 -16777216 true "" "set-histogram-num-bars sqrt count workers\nset-plot-y-range 0 ceiling sqrt count workers\nset-plot-x-range floor ln-hopital min [wealth] of workers ceiling ln-hopital max [wealth] of workers\nhistogram map ln-hopital [wealth] of workers with [wealth > 0]"
+"default" 1.0 1 -16777216 true "" "set-histogram-num-bars sqrt count workers\nset-plot-y-range 0 ceiling sqrt count workers\nset-plot-x-range floor ln-hopital min [wealth] of workers ceiling ln-hopital max [wealth] of workers\nhistogram map ln-hopital [wealth] of workers with [wealth > 0 and not extorter?]"
 
 PLOT
 1235
@@ -1603,19 +1625,19 @@ PLOT
 530
 1500
 650
-Wealth of workers
+Avg Wealth of workers
 Time
 Ln
 0.0
 10.0
 0.0
-10.0
+1.0
 true
 true
 "" ""
 PENS
-"regular" 1.0 0 -14439633 true "" "set-plot-x-range 0 (ticks + 5)\nset-plot-y-range 0 max (list 1 ceiling ln-hopital max [wealth] of workers)\nplot ln-hopital mean [wealth] of workers with [not extorter?]"
-"extorter" 1.0 0 -5298144 true "" "plot-wealth-of-extorters"
+"regular" 1.0 0 -14439633 true "" "set-plot-x-range 0 (ticks + 5)\nset-plot-y-range 0 max (list 1 ceiling ln-hopital max [wealth] of workers)\nplot fn-wealth-of-regular-worker"
+"extorter" 1.0 0 -5298144 true "" "plot fn-wealth-of-extorters"
 
 PLOT
 705
@@ -1653,7 +1675,7 @@ true
 true
 "" ""
 PENS
-"mean" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nset-plot-y-range 9 max (list 1 (1 + ceiling ln-hopital max [patrimonial-base-E] of banks))\nplot ln-hopital mean [patrimonial-base-E] of banks"
+"mean" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nset-plot-y-range 9 max (list 1 (0 + ceiling ln-hopital max [patrimonial-base-E] of banks))\nplot ln-hopital mean [patrimonial-base-E] of banks"
 "max" 1.0 0 -2674135 true "" "plot ln-hopital max [patrimonial-base-E] of banks"
 "min" 1.0 0 -13345367 true "" "plot ln-hopital min [patrimonial-base-E] of banks"
 
@@ -1676,7 +1698,7 @@ propensity-to-be-extorter-epsilon
 propensity-to-be-extorter-epsilon
 0
 100
-20.0
+10.0
 5
 1
 %
@@ -1708,7 +1730,7 @@ Time
 0.0
 1.0
 0.0
-100.0
+5.0
 true
 true
 "" ""
@@ -1901,7 +1923,7 @@ percent-transfer-fondo
 percent-transfer-fondo
 0
 100
-50.0
+0.0
 50
 1
 %
@@ -2105,12 +2127,12 @@ Time
 0.0
 10.0
 0.0
-100.0
+10.0
 true
 true
 "" ""
 PENS
-"Extorted" 1.0 0 -955883 true "" "set-plot-x-range 0 (ticks + 5)\nplot (N-extorted-firms / count firms) * 100\n"
+"Extorted" 1.0 0 -4671451 true "" "set-plot-x-range 0 (ticks + 5)\nplot (N-extorted-firms / count firms) * 100\n"
 "Punished" 1.0 0 -5298144 true "" "plot (N-punished-firms / count firms) * 100"
 
 TEXTBOX
@@ -2167,6 +2189,24 @@ TEXTBOX
 11
 5.0
 1
+
+PLOT
+1500
+670
+1765
+790
+Wealth distribution of extorters
+log wealth
+freq
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 1 -16777216 true "" "set-histogram-num-bars sqrt count workers\nset-plot-y-range 0 ceiling sqrt count workers\nset-plot-x-range floor ln-hopital min [wealth] of workers ceiling ln-hopital max [wealth] of workers\nhistogram map ln-hopital [wealth] of workers with [wealth > 0 and extorter?]"
 
 @#$#@#$#@
 Overview
