@@ -1175,7 +1175,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "set-plot-x-range 0  (ticks + 5)\nset-plot-y-range 0  0.3\nplot-unemployment-rate"
+"default" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nset-plot-y-range 0  0.3\nplot-unemployment-rate"
 "pen-1" 1.0 2 -7500403 true "" "plot 0"
 "pen-2" 1.0 0 -2674135 true "" "plot 0.10"
 
@@ -1273,7 +1273,7 @@ true
 true
 "" ""
 PENS
-"mean" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nset-plot-y-range 0 max (list 1 ceiling ln-hopital max [net-worth-A] of firms)\nplot ln-hopital mean [net-worth-A] of firms"
+"mean" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nset-plot-y-range 0 max (list 1 ceiling ln-hopital max [net-worth-A] of firms)\nplot ln-hopital mean [net-worth-A] of firms"
 "min" 1.0 0 -2674135 true "" "plot ln-hopital min [net-worth-A] of firms"
 "max" 1.0 2 -13840069 true "set-plot-pen-mode 2" "plot ln-hopital max [net-worth-A] of firms"
 
@@ -1293,7 +1293,7 @@ true
 true
 "" ""
 PENS
-"mean" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nplot mean [propensity-to-consume-c] of workers"
+"mean" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot mean [propensity-to-consume-c] of workers"
 "min" 1.0 2 -2674135 true "" "plot min [propensity-to-consume-c] of workers"
 "max" 1.0 0 -13345367 true "" "plot max [propensity-to-consume-c] of workers"
 
@@ -1313,7 +1313,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nset-plot-y-range -5 10\nplot quarterly-inflation"
+"default" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nset-plot-y-range -5 10\nplot quarterly-inflation"
 "pen-1" 1.0 2 -5987164 true "" "plot 0"
 
 PLOT
@@ -1376,7 +1376,7 @@ true
 false
 "" ""
 PENS
-"Nom." 1.0 0 -12030287 true "" "set-plot-x-range 0 (ticks + 5)\nplot real-GDP"
+"Nom." 1.0 0 -12030287 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot real-GDP"
 
 PLOT
 705
@@ -1394,7 +1394,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nplot households-consumption-to-gdp-ratio"
+"default" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot households-consumption-to-gdp-ratio"
 
 PLOT
 970
@@ -1412,15 +1412,15 @@ true
 true
 "" ""
 PENS
-"mean" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nplot ln average-market-price"
-"min" 1.0 2 -2674135 true "" "set-plot-x-range 0 (ticks + 5)\nplot ln min [individual-price-P] of firms"
-"max" 1.0 0 -13345367 true "" "set-plot-x-range 0 (ticks + 5)\nplot ln max [individual-price-P] of firms"
+"mean" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot ln average-market-price"
+"min" 1.0 2 -2674135 true "" "plot ln min [individual-price-P] of firms"
+"max" 1.0 0 -13345367 true "" "plot ln max [individual-price-P] of firms"
 
 TEXTBOX
-216
-61
-260
-79
+200
+60
+244
+78
 100
 12
 5.0
@@ -1437,90 +1437,90 @@ Init values
 1
 
 TEXTBOX
-216
-99
-290
-117
+200
+98
+274
+116
 0.05
 12
 5.0
 1
 
 TEXTBOX
-217
-138
-268
-156
+201
+137
+252
+155
 0.10
 12
 5.0
 1
 
 TEXTBOX
-217
-173
-282
-191
+201
+172
+231
+190
 0.10
 12
 5.0
 1
 
 TEXTBOX
-217
-211
-290
-229
+201
+210
+236
+228
 0.10
 12
 5.0
 1
 
 TEXTBOX
-221
-287
-282
-305
+205
+280
+235
+298
 4
 12
 5.0
 1
 
 TEXTBOX
-222
-320
-277
-338
+206
+319
+236
+337
 2
 12
 5.0
 1
 
 TEXTBOX
-221
-353
-271
-371
+205
+352
+230
+370
 2
 12
 5.0
 1
 
 TEXTBOX
-220
-391
-292
-409
+204
+390
+234
+408
 0.87
 12
 5.0
 1
 
 TEXTBOX
-219
-428
-293
-446
+200
+425
+240
+443
 0.15
 12
 5.0
@@ -1578,7 +1578,7 @@ true
 true
 "" ""
 PENS
-"mean" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nset-plot-y-range 0 ceiling (max (list 1 [production-Y] of firms))\nplot mean [production-Y] of fn-incumbent-firms"
+"mean" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nset-plot-y-range 0 ceiling (max (list 1 [production-Y] of firms))\nplot mean [production-Y] of fn-incumbent-firms"
 "max" 1.0 0 -13840069 true "" "plot max [production-Y] of fn-incumbent-firms"
 "min" 1.0 0 -2674135 true "" "plot min [production-Y] of fn-incumbent-firms"
 
@@ -1598,7 +1598,7 @@ true
 true
 "" ""
 PENS
-"mean" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nset-plot-y-range 0 ceiling (max (list 1 [desired-production-Yd] of firms))\nplot mean [desired-production-Yd] of firms"
+"mean" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nset-plot-y-range 0 ceiling (max (list 1 [desired-production-Yd] of firms))\nplot mean [desired-production-Yd] of firms"
 "max" 1.0 0 -13840069 true "" "plot max [desired-production-Yd] of firms"
 "min" 1.0 0 -2674135 true "" "plot min [desired-production-Yd] of firms"
 
@@ -1618,7 +1618,7 @@ true
 false
 "" ""
 PENS
-"mean" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nplot 100 * mean [my-interest-rate] of firms"
+"mean" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot 100 * mean [my-interest-rate] of firms"
 
 PLOT
 1235
@@ -1636,7 +1636,7 @@ true
 true
 "" ""
 PENS
-"regular" 1.0 0 -14439633 true "" "set-plot-x-range 0 (ticks + 5)\nset-plot-y-range 0 max (list 1 ceiling ln-hopital max [wealth] of workers)\nplot fn-wealth-of-regular-worker"
+"regular" 1.0 0 -14439633 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nset-plot-y-range 0 max (list 1 ceiling ln-hopital max [wealth] of workers)\nplot fn-wealth-of-regular-worker"
 "extorter" 1.0 0 -5298144 true "" "plot fn-wealth-of-extorters"
 
 PLOT
@@ -1655,7 +1655,7 @@ true
 true
 "" ""
 PENS
-"mean" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nplot ln-hopital mean [inventory-S] of firms"
+"mean" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot ln-hopital mean [inventory-S] of firms"
 "max" 1.0 0 -2674135 true "" "plot ln-hopital max [inventory-S] of firms"
 "min" 1.0 0 -13345367 true "" "plot ln-hopital min [inventory-S] of firms"
 
@@ -1675,7 +1675,7 @@ true
 true
 "" ""
 PENS
-"mean" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nset-plot-y-range 9 max (list 1 (0 + ceiling ln-hopital max [patrimonial-base-E] of banks))\nplot ln-hopital mean [patrimonial-base-E] of banks"
+"mean" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nset-plot-y-range 9 max (list 1 (0 + ceiling ln-hopital max [patrimonial-base-E] of banks))\nplot ln-hopital mean [patrimonial-base-E] of banks"
 "max" 1.0 0 -2674135 true "" "plot ln-hopital max [patrimonial-base-E] of banks"
 "min" 1.0 0 -13345367 true "" "plot ln-hopital min [patrimonial-base-E] of banks"
 
@@ -1735,14 +1735,14 @@ true
 true
 "" ""
 PENS
-"Active" 1.0 0 -5298144 true "" "set-plot-x-range 0 (ticks + 5)\nplot (N-extorters / count workers) * 100"
+"Active" 1.0 0 -5298144 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot (N-extorters / count workers) * 100"
 "In-jail" 1.0 0 -12412731 true "" "plot (N-extorters-in-jail / count workers) * 100"
 
 SLIDER
-25
-645
-195
-678
+20
+630
+190
+663
 proportion-of-pizzo
 proportion-of-pizzo
 0
@@ -1769,7 +1769,7 @@ true
 true
 "" ""
 PENS
-"pizzo" 1.0 0 -13345367 true "" "set-plot-x-range 0 (ticks + 5)\nplot pizzo-to-gdp-ratio"
+"pizzo" 1.0 0 -13345367 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot pizzo-to-gdp-ratio"
 "punish" 1.0 0 -5298144 true "" "plot punish-to-gdp-ratio"
 
 SLIDER
@@ -1803,7 +1803,7 @@ true
 true
 "" ""
 PENS
-"mean" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nplot ln mean [wage-offered-Wb] of firms"
+"mean" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot ln mean [wage-offered-Wb] of firms"
 "min" 1.0 0 -2674135 true "" "plot ln min [wage-offered-Wb] of firms"
 "max" 1.0 0 -13345367 true "" "plot ln max [wage-offered-Wb] of firms"
 
@@ -1818,10 +1818,10 @@ TEXTBOX
 1
 
 TEXTBOX
-215
-485
-260
-503
+197
+473
+242
+491
 0.20
 12
 5.0
@@ -1838,10 +1838,10 @@ TEXTBOX
 1
 
 TEXTBOX
-220
-660
-250
-678
+195
+640
+225
+658
 10%
 12
 5.0
@@ -1902,13 +1902,13 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "set-plot-x-range 0 (ticks + 5)\nplot (gini-index-reserve / round (number-of-firms * 5)) / 0.5"
+"default" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot (gini-index-reserve / round (number-of-firms * 5)) / 0.5"
 
 TEXTBOX
-10
-570
-205
-588
+8
+554
+203
+572
 Pizzo payment parameters
 12
 0.0
@@ -1940,60 +1940,60 @@ TEXTBOX
 1
 
 TEXTBOX
-10
-505
-200
-523
+8
+494
+198
+512
 Searching strategy
 12
 0.0
 1
 
 CHOOSER
-5
-520
-195
-565
+0
+510
+190
+555
 type-of-search
 type-of-search
 "random-search" "around-search"
 0
 
 CHOOSER
-5
-585
-195
-630
+0
+570
+190
+615
 type-of-pizzo
 type-of-pizzo
 "proportion" "constant"
 0
 
 TEXTBOX
-25
-630
-175
-648
+23
+614
+173
+632
 Used if \"proportion\"
 12
 3.0
 1
 
 TEXTBOX
-25
-680
-175
-698
+23
+664
+173
+682
 Used if \"constant\"
 12
 3.0
 1
 
 SLIDER
-25
-695
-195
-728
+20
+680
+190
+713
 constant-pizzo
 constant-pizzo
 1
@@ -2005,30 +2005,30 @@ $
 HORIZONTAL
 
 TEXTBOX
-220
-710
-245
-728
+202
+693
+227
+711
 1
 12
 5.0
 1
 
 TEXTBOX
-215
-545
-255
-563
+197
+533
+237
+551
 rand
 12
 5.0
 1
 
 TEXTBOX
-215
-610
-265
-628
+197
+593
+227
+611
 prop
 12
 5.0
@@ -2132,7 +2132,7 @@ true
 true
 "" ""
 PENS
-"Extorted" 1.0 0 -4671451 true "" "set-plot-x-range 0 (ticks + 5)\nplot (N-extorted-firms / count firms) * 100\n"
+"Extorted" 1.0 0 -4671451 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot (N-extorted-firms / count firms) * 100\n"
 "Punished" 1.0 0 -5298144 true "" "plot (N-punished-firms / count firms) * 100"
 
 TEXTBOX
@@ -2209,25 +2209,50 @@ PENS
 "default" 1.0 1 -16777216 true "" "set-histogram-num-bars sqrt count workers\nset-plot-y-range 0 ceiling sqrt count workers\nset-plot-x-range floor ln-hopital min [wealth] of workers ceiling ln-hopital max [wealth] of workers\nhistogram map ln-hopital [wealth] of workers with [wealth > 0 and extorter?]"
 
 TEXTBOX
-15
-735
-165
-753
-Debug graphics
+10
+715
+160
+733
+Graphics debugging
 12
 0.0
 1
 
 SWITCH
-5
-755
-195
-788
-show-burning-phase?
-show-burning-phase?
 0
+730
+190
+763
+show-burning-phase?
+show-burning-phase?
+1
 1
 -1000
+
+SLIDER
+25
+765
+190
+798
+burning-periods
+burning-periods
+100
+500
+500.0
+50
+1
+ticks
+HORIZONTAL
+
+TEXTBOX
+195
+780
+220
+798
+500
+11
+5.0
+1
 
 @#$#@#$#@
 Overview
