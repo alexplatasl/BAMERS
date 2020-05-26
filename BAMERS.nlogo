@@ -1740,9 +1740,9 @@ PENS
 
 SLIDER
 25
-660
+645
 195
-693
+678
 proportion-of-pizzo
 proportion-of-pizzo
 0
@@ -1839,9 +1839,9 @@ TEXTBOX
 
 TEXTBOX
 220
-675
+660
 250
-693
+678
 10%
 12
 5.0
@@ -1906,9 +1906,9 @@ PENS
 
 TEXTBOX
 10
-580
+570
 205
-598
+588
 Pizzo payment parameters
 12
 0.0
@@ -1941,9 +1941,9 @@ TEXTBOX
 
 TEXTBOX
 10
-510
+505
 200
-528
+523
 Searching strategy
 12
 0.0
@@ -1951,9 +1951,9 @@ Searching strategy
 
 CHOOSER
 5
-525
+520
 195
-570
+565
 type-of-search
 type-of-search
 "random-search" "around-search"
@@ -1961,9 +1961,9 @@ type-of-search
 
 CHOOSER
 5
-595
+585
 195
-640
+630
 type-of-pizzo
 type-of-pizzo
 "proportion" "constant"
@@ -1971,9 +1971,9 @@ type-of-pizzo
 
 TEXTBOX
 25
-645
+630
 175
-663
+648
 Used if \"proportion\"
 12
 3.0
@@ -1981,9 +1981,9 @@ Used if \"proportion\"
 
 TEXTBOX
 25
-700
+680
 175
-718
+698
 Used if \"constant\"
 12
 3.0
@@ -1991,9 +1991,9 @@ Used if \"constant\"
 
 SLIDER
 25
-715
+695
 195
-748
+728
 constant-pizzo
 constant-pizzo
 1
@@ -2006,9 +2006,9 @@ HORIZONTAL
 
 TEXTBOX
 220
-730
+710
 245
-748
+728
 1
 12
 5.0
@@ -2016,9 +2016,9 @@ TEXTBOX
 
 TEXTBOX
 215
-550
+545
 255
-568
+563
 rand
 12
 5.0
@@ -2026,9 +2026,9 @@ rand
 
 TEXTBOX
 215
-620
+610
 265
-638
+628
 prop
 12
 5.0
@@ -2207,6 +2207,27 @@ false
 "" ""
 PENS
 "default" 1.0 1 -16777216 true "" "set-histogram-num-bars sqrt count workers\nset-plot-y-range 0 ceiling sqrt count workers\nset-plot-x-range floor ln-hopital min [wealth] of workers ceiling ln-hopital max [wealth] of workers\nhistogram map ln-hopital [wealth] of workers with [wealth > 0 and extorter?]"
+
+TEXTBOX
+15
+735
+165
+753
+Debug graphics
+12
+0.0
+1
+
+SWITCH
+5
+755
+195
+788
+show-burning-phase?
+show-burning-phase?
+0
+1
+-1000
 
 @#$#@#$#@
 Overview
