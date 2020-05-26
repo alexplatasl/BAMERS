@@ -752,9 +752,9 @@ end
 ; b_1 skewness is calculated following:
 ; Joanes, D.N. and Gill, C.A. (1998). Comparing measures of sample skewness and kurtosis.
 ; The Statistician, 47, 183–189.
-to-report skewness-of-wealth
+to-report skewness-of-wealth-regular-worker
   ifelse (ticks > 0)[
-    let wealths [wealth] of workers
+    let wealths [wealth] of workers with [not extorter?]
     let n round (number-of-firms * 5)
     let x-bar mean wealths
 
@@ -837,6 +837,22 @@ end
 
 to-report avg-net-worth
   report mean [net-worth-A] of fn-incumbent-firms
+end
+
+to-report skewness-of-networth
+  ifelse (ticks > 0 and any? firms)[
+    let networth [net-worth-A] of fn-incumbent-firms
+    let n number-of-firms
+    let x-bar mean networth
+
+    let first-part ((n - 1 ) / n)^ (3 / 2)
+    let m-3-part ( reduce + map [i -> ( i - x-bar ) ^ 3] networth ) / n
+    let m-2-part ( reduce + map [i -> ( i - x-bar ) ^ 2] networth ) / n
+
+    report  first-part * (m-3-part / (m-2-part) ^ (3 / 2 ))
+  ][
+    report 0
+  ]
 end
 
 ;;;;;;;;;; regular worker related reporters ;;;;;;;;;;
@@ -1923,7 +1939,7 @@ percent-transfer-fondo
 percent-transfer-fondo
 0
 100
-0.0
+50.0
 50
 1
 %
@@ -2225,7 +2241,7 @@ SWITCH
 763
 show-burning-phase?
 show-burning-phase?
-1
+0
 1
 -1000
 
@@ -2947,11 +2963,12 @@ NetLogo 6.1.1
     <metric>quarterly-inflation</metric>
     <metric>yearly-inflation</metric>
     <metric>gini-index</metric>
-    <metric>skewness-of-wealth</metric>
+    <metric>skewness-of-wealth-regular-worker</metric>
     <metric>fn-wealth-of-regular-worker</metric>
     <metric>households-consumption-to-gdp-ratio</metric>
     <metric>avg-propensity-to-consume</metric>
     <metric>avg-net-worth</metric>
+    <metric>skewness-of-networth</metric>
     <metric>avg-firm-production</metric>
     <metric>ln average-market-price</metric>
     <metric>avg-interest-rate</metric>
