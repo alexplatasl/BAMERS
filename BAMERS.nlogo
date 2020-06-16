@@ -264,7 +264,7 @@ end
 to labor-market-opens
   if (sum [number-of-vacancies-offered-V] of firms > 0) [
     let potential-firms firms with [number-of-vacancies-offered-V > 0]
-    ask workers with [not employed? and not extorter?][
+    ask workers with [not employed? and not extorter? and not in-jail?][
       ifelse (not empty? [my-firm] of my-potential-firms)
       [set my-potential-firms (turtle-set my-firm n-of (labor-market-M - 1 ) potential-firms)]
       [set my-potential-firms n-of (min (list labor-market-M count potential-firms)) potential-firms]
@@ -287,7 +287,7 @@ end
 to hiring-step [trials]
   while [trials > 0]
   [
-    ask workers with [not employed? and any? my-potential-firms and not extorter?][
+    ask workers with [not employed? and any? my-potential-firms and not in-jail?][
       move-to max-one-of my-potential-firms [wage-offered-Wb]
     ]
     ask firms with [number-of-vacancies-offered-V > 0 ][
@@ -429,8 +429,8 @@ end
 
 ;;;;;;;;;; to goods-market  ;;;;;;;;;;
 to goods-market ;; an observer procedure
-  let average-savings mean [savings] of workers
-  ask workers[
+  let average-savings mean [savings] of workers with [not in-jail?]
+  ask workers with [not in-jail?][
     set wealth income + savings
     set propensity-to-consume-c 1 / (1 + (fn-tanh (savings / average-savings)) ^ beta)
     let money-to-consume propensity-to-consume-c * wealth
@@ -471,15 +471,21 @@ end
 
 ;;;;;;;;;; to extortion ;;;;;;;;;;
 to extortion
-  become-extortionists
-  extortion-search
-  execute-extortion
-  jail-or-punishment
-  in-jail
+  if (propensity-to-be-extorter-epsilon > 0)[
+    become-extortionists
+  ]
+  if (any? workers with [extorter? and time-in-jail < 1])[
+    extortion-search
+    execute-extortion
+    jail-or-punishment
+  ]
+  if (any? workers with [time-in-jail > 0])[
+    in-jail
+  ]
 end
 
 to become-extortionists
-  let Q1 lower-quartile [savings] of workers with [not extorter?]  ;; The extorters have already decided.
+  let Q1 lower-quartile [savings] of workers with [not extorter? and not in-jail?]  ;; The extorters have already decided.
   ask workers with [not employed? and savings < Q1 ][
     if (random 100 < propensity-to-be-extorter-epsilon)[
       set extorter? true
@@ -754,7 +760,7 @@ end
 ; The Statistician, 47, 183–189.
 to-report skewness-of-wealth-regular-worker
   ifelse (ticks > 0)[
-    let wealths [wealth] of workers with [not extorter?]
+    let wealths [wealth] of workers with [not extorter? and not in-jail?]
     let n round (number-of-firms * 5)
     let x-bar mean wealths
 
@@ -839,6 +845,11 @@ to-report avg-net-worth
   report mean [net-worth-A] of fn-incumbent-firms
 end
 
+to-report net-worth-of-firms-to-gdp-ratio
+  let sum-net-worth sum [net-worth-A] of firms
+  report sum-net-worth / nominal-GDP
+end
+
 to-report skewness-of-networth
   ifelse (ticks > 0 and any? firms)[
     let networth [net-worth-A] of fn-incumbent-firms
@@ -865,23 +876,23 @@ to-report avg-propensity-to-consume
 end
 
 to-report avg-propensity-to-consume-regular-worker
-  ifelse (any? workers with [not extorter?])[
-    report mean [propensity-to-consume-c] of workers with [not extorter?]
+  ifelse (any? workers with [not extorter? and not in-jail?])[
+    report mean [propensity-to-consume-c] of workers with [not extorter? and not in-jail?]
   ][
     report 0
   ]
 end
 
 to-report fn-wealth-of-regular-worker
-  ifelse (any? workers with [not extorter?])[
-    report ln-hopital mean [wealth] of workers with [not extorter?]
+  ifelse (any? workers with [not extorter? and not in-jail?])[
+    report ln-hopital mean [wealth] of workers with [not extorter? and not in-jail?]
   ][
     report 0
   ]
 end
 
 to-report wealth-of-regular-worker-to-gdp-ratio
-  let sum-wealth sum [wealth] of workers with [not extorter?]
+  let sum-wealth sum [wealth] of workers with [not extorter? and not in-jail?]
   report sum-wealth / nominal-GDP
 end
 
@@ -967,6 +978,33 @@ end
 to-report wealth-of-extorters-to-gdp-ratio
   let sum-wealth sum [wealth] of workers with [extorter?]
   report sum-wealth / nominal-GDP
+end
+
+to-report avg-wealth-of-extorters-to-gdp-ratio
+  ifelse (any? workers with [extorter?])[
+    let sum-wealth sum [wealth] of workers with [extorter?]
+    let extorters count workers with [extorter?]
+    let avg-wealth sum-wealth / extorters
+    report avg-wealth / nominal-GDP
+  ][
+    report 0
+  ]
+end
+
+to-report skewness-of-wealth-extorter
+  ifelse (ticks > 0 and any? workers with [extorter?])[
+    let wealths [wealth] of workers with [extorter?]
+    let n round (number-of-firms * 5)
+    let x-bar mean wealths
+
+    let first-part ((n - 1 ) / n)^ (3 / 2)
+    let m-3-part ( reduce + map [i -> ( i - x-bar ) ^ 3] wealths ) / n
+    let m-2-part ( reduce + map [i -> ( i - x-bar ) ^ 2] wealths ) / n
+
+    report  first-part * (m-3-part / (m-2-part) ^ (3 / 2 ))
+  ][
+    report 0
+  ]
 end
 
 to-report N-extorted-firms
@@ -1191,7 +1229,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nset-plot-y-range 0  0.3\nplot-unemployment-rate"
+"default" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value keep-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nset-plot-y-range 0  0.3\nplot-unemployment-rate"
 "pen-1" 1.0 2 -7500403 true "" "plot 0"
 "pen-2" 1.0 0 -2674135 true "" "plot 0.10"
 
@@ -1289,7 +1327,7 @@ true
 true
 "" ""
 PENS
-"mean" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nset-plot-y-range 0 max (list 1 ceiling ln-hopital max [net-worth-A] of firms)\nplot ln-hopital mean [net-worth-A] of firms"
+"mean" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value keep-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nset-plot-y-range 0 max (list 1 ceiling ln-hopital max [net-worth-A] of firms)\nplot ln-hopital mean [net-worth-A] of firms"
 "min" 1.0 0 -2674135 true "" "plot ln-hopital min [net-worth-A] of firms"
 "max" 1.0 2 -13840069 true "set-plot-pen-mode 2" "plot ln-hopital max [net-worth-A] of firms"
 
@@ -1309,7 +1347,7 @@ true
 true
 "" ""
 PENS
-"mean" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot mean [propensity-to-consume-c] of workers"
+"mean" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value keep-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot mean [propensity-to-consume-c] of workers"
 "min" 1.0 2 -2674135 true "" "plot min [propensity-to-consume-c] of workers"
 "max" 1.0 0 -13345367 true "" "plot max [propensity-to-consume-c] of workers"
 
@@ -1329,7 +1367,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nset-plot-y-range -5 10\nplot quarterly-inflation"
+"default" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value keep-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nset-plot-y-range -5 10\nplot quarterly-inflation"
 "pen-1" 1.0 2 -5987164 true "" "plot 0"
 
 PLOT
@@ -1392,7 +1430,7 @@ true
 false
 "" ""
 PENS
-"Nom." 1.0 0 -12030287 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot real-GDP"
+"Nom." 1.0 0 -12030287 true "" "set-plot-x-range ifelse-value keep-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot real-GDP"
 
 PLOT
 676
@@ -1410,7 +1448,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot households-consumption-to-gdp-ratio"
+"default" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value keep-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot households-consumption-to-gdp-ratio"
 
 PLOT
 941
@@ -1428,7 +1466,7 @@ true
 true
 "" ""
 PENS
-"mean" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot ln average-market-price"
+"mean" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value keep-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot ln average-market-price"
 "min" 1.0 2 -2674135 true "" "plot ln min [individual-price-P] of firms"
 "max" 1.0 0 -13345367 true "" "plot ln max [individual-price-P] of firms"
 
@@ -1558,7 +1596,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 1 -16777216 true "" "set-histogram-num-bars sqrt count workers\nset-plot-y-range 0 ceiling sqrt count workers\nset-plot-x-range floor ln-hopital min [wealth] of workers ceiling ln-hopital max [wealth] of workers\nhistogram map ln-hopital [wealth] of workers with [wealth > 0 and not extorter?]"
+"default" 1.0 1 -16777216 true "" "set-histogram-num-bars sqrt count workers\nset-plot-y-range 0 ceiling sqrt count workers\nset-plot-x-range floor ln-hopital min [wealth] of workers ceiling ln-hopital max [wealth] of workers\nhistogram map ln-hopital [wealth] of workers with [wealth > 0 and not extorter? and not in-jail?]"
 
 PLOT
 1206
@@ -1594,7 +1632,7 @@ true
 true
 "" ""
 PENS
-"mean" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nset-plot-y-range 0 ceiling (max (list 1 [production-Y] of firms))\nplot mean [production-Y] of fn-incumbent-firms"
+"mean" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value keep-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nset-plot-y-range 0 ceiling (max (list 1 [production-Y] of firms))\nplot mean [production-Y] of fn-incumbent-firms"
 "max" 1.0 0 -13840069 true "" "plot max [production-Y] of fn-incumbent-firms"
 "min" 1.0 0 -2674135 true "" "plot min [production-Y] of fn-incumbent-firms"
 
@@ -1614,7 +1652,7 @@ true
 true
 "" ""
 PENS
-"mean" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nset-plot-y-range 0 ceiling (max (list 1 [desired-production-Yd] of firms))\nplot mean [desired-production-Yd] of firms"
+"mean" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value keep-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nset-plot-y-range 0 ceiling (max (list 1 [desired-production-Yd] of firms))\nplot mean [desired-production-Yd] of firms"
 "max" 1.0 0 -13840069 true "" "plot max [desired-production-Yd] of firms"
 "min" 1.0 0 -2674135 true "" "plot min [desired-production-Yd] of firms"
 
@@ -1634,7 +1672,7 @@ true
 false
 "" ""
 PENS
-"mean" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot 100 * mean [my-interest-rate] of firms"
+"mean" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value keep-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot 100 * mean [my-interest-rate] of firms"
 
 PLOT
 1206
@@ -1652,7 +1690,7 @@ true
 true
 "" ""
 PENS
-"regular" 1.0 0 -14439633 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nset-plot-y-range 0 max (list 1 ceiling ln-hopital max [wealth] of workers)\nplot fn-wealth-of-regular-worker"
+"regular" 1.0 0 -14439633 true "" "set-plot-x-range ifelse-value keep-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nset-plot-y-range 0 max (list 1 ceiling ln-hopital max [wealth] of workers)\nplot fn-wealth-of-regular-worker"
 "extorter" 1.0 0 -5298144 true "" "plot fn-wealth-of-extorters"
 
 PLOT
@@ -1671,7 +1709,7 @@ true
 true
 "" ""
 PENS
-"mean" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot ln-hopital mean [inventory-S] of firms"
+"mean" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value keep-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot ln-hopital mean [inventory-S] of firms"
 "max" 1.0 0 -2674135 true "" "plot ln-hopital max [inventory-S] of firms"
 "min" 1.0 0 -13345367 true "" "plot ln-hopital min [inventory-S] of firms"
 
@@ -1691,7 +1729,7 @@ true
 true
 "" ""
 PENS
-"mean" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nset-plot-y-range 9 max (list 1 (0 + ceiling ln-hopital max [patrimonial-base-E] of banks))\nplot ln-hopital mean [patrimonial-base-E] of banks"
+"mean" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value keep-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nset-plot-y-range 9 max (list 1 (0 + ceiling ln-hopital max [patrimonial-base-E] of banks))\nplot ln-hopital mean [patrimonial-base-E] of banks"
 "max" 1.0 0 -2674135 true "" "plot ln-hopital max [patrimonial-base-E] of banks"
 "min" 1.0 0 -13345367 true "" "plot ln-hopital min [patrimonial-base-E] of banks"
 
@@ -1714,7 +1752,7 @@ propensity-to-be-extorter-epsilon
 propensity-to-be-extorter-epsilon
 0
 100
-10.0
+20.0
 5
 1
 %
@@ -1751,7 +1789,7 @@ true
 true
 "" ""
 PENS
-"Active" 1.0 0 -5298144 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot (N-extorters / count workers) * 100"
+"Active" 1.0 0 -5298144 true "" "set-plot-x-range ifelse-value keep-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot (N-extorters / count workers) * 100"
 "In-jail" 1.0 0 -12412731 true "" "plot (N-extorters-in-jail / count workers) * 100"
 
 SLIDER
@@ -1785,7 +1823,7 @@ true
 true
 "" ""
 PENS
-"pizzo" 1.0 0 -13345367 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot pizzo-to-gdp-ratio"
+"pizzo" 1.0 0 -13345367 true "" "set-plot-x-range ifelse-value keep-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot pizzo-to-gdp-ratio"
 "punish" 1.0 0 -5298144 true "" "plot punish-to-gdp-ratio"
 
 SLIDER
@@ -1819,7 +1857,7 @@ true
 true
 "" ""
 PENS
-"mean" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot ln mean [wage-offered-Wb] of firms"
+"mean" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value keep-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot ln mean [wage-offered-Wb] of firms"
 "min" 1.0 0 -2674135 true "" "plot ln min [wage-offered-Wb] of firms"
 "max" 1.0 0 -13345367 true "" "plot ln max [wage-offered-Wb] of firms"
 
@@ -1918,7 +1956,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot (gini-index-reserve / round (number-of-firms * 5)) / 0.5"
+"default" 1.0 0 -16777216 true "" "set-plot-x-range ifelse-value keep-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot (gini-index-reserve / round (number-of-firms * 5)) / 0.5"
 
 TEXTBOX
 8
@@ -2057,7 +2095,7 @@ SWITCH
 748
 proportional-refund?
 proportional-refund?
-0
+1
 1
 -1000
 
@@ -2148,7 +2186,7 @@ true
 true
 "" ""
 PENS
-"Extorted" 1.0 0 -4671451 true "" "set-plot-x-range ifelse-value show-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot (N-extorted-firms / count firms) * 100\n"
+"Extorted" 1.0 0 -4671451 true "" "set-plot-x-range ifelse-value keep-burning-phase? [ 0 ] [ max (list 0 (ticks - burning-periods))  ] (ticks + 5)\nplot (N-extorted-firms / count firms) * 100\n"
 "Punished" 1.0 0 -5298144 true "" "plot (N-punished-firms / count firms) * 100"
 
 TEXTBOX
@@ -2239,9 +2277,9 @@ SWITCH
 730
 190
 763
-show-burning-phase?
-show-burning-phase?
-0
+keep-burning-phase?
+keep-burning-phase?
+1
 1
 -1000
 
@@ -2965,6 +3003,7 @@ NetLogo 6.1.1
     <metric>gini-index</metric>
     <metric>skewness-of-wealth-regular-worker</metric>
     <metric>fn-wealth-of-regular-worker</metric>
+    <metric>wealth-of-regular-worker-to-gdp-ratio</metric>
     <metric>households-consumption-to-gdp-ratio</metric>
     <metric>avg-propensity-to-consume</metric>
     <metric>avg-net-worth</metric>
@@ -2976,6 +3015,8 @@ NetLogo 6.1.1
     <metric>inventory-to-gdp-ratio</metric>
     <metric>patrimonial-bank-to-gdp-ratio</metric>
     <metric>fn-wealth-of-extorters</metric>
+    <metric>avg-wealth-of-extorters-to-gdp-ratio</metric>
+    <metric>skewness-of-wealth-extorter</metric>
     <metric>N-extorted-firms</metric>
     <metric>N-punished-firms</metric>
     <metric>N-extorters</metric>
@@ -3068,14 +3109,32 @@ NetLogo 6.1.1
   <experiment name="thesis-epsilon" repetitions="20" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
-    <metric>fn-unemployment-rate</metric>
-    <metric>gini-index</metric>
-    <metric>skewness-of-wealth</metric>
-    <metric>avg-net-worth</metric>
-    <metric>avg-propensity-to-consume</metric>
     <metric>real-GDP</metric>
-    <metric>average-market-price</metric>
+    <metric>fn-unemployment-rate</metric>
+    <metric>quarterly-inflation</metric>
+    <metric>yearly-inflation</metric>
+    <metric>gini-index</metric>
+    <metric>skewness-of-wealth-regular-worker</metric>
+    <metric>fn-wealth-of-regular-worker</metric>
+    <metric>wealth-of-regular-worker-to-gdp-ratio</metric>
+    <metric>households-consumption-to-gdp-ratio</metric>
+    <metric>avg-propensity-to-consume</metric>
+    <metric>avg-net-worth</metric>
+    <metric>skewness-of-networth</metric>
+    <metric>avg-firm-production</metric>
+    <metric>ln average-market-price</metric>
     <metric>avg-interest-rate</metric>
+    <metric>avg-wage-offered</metric>
+    <metric>inventory-to-gdp-ratio</metric>
+    <metric>patrimonial-bank-to-gdp-ratio</metric>
+    <metric>fn-wealth-of-extorters</metric>
+    <metric>avg-wealth-of-extorters-to-gdp-ratio</metric>
+    <metric>N-extorted-firms</metric>
+    <metric>N-punished-firms</metric>
+    <metric>N-extorters</metric>
+    <metric>N-extorters-in-jail</metric>
+    <metric>pizzo-to-gdp-ratio</metric>
+    <metric>punish-to-gdp-ratio</metric>
     <enumeratedValueSet variable="type-of-search">
       <value value="&quot;random-search&quot;"/>
     </enumeratedValueSet>
@@ -3108,14 +3167,32 @@ NetLogo 6.1.1
   <experiment name="thesis-caught" repetitions="20" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
-    <metric>fn-unemployment-rate</metric>
-    <metric>gini-index</metric>
-    <metric>skewness-of-wealth</metric>
-    <metric>avg-net-worth</metric>
-    <metric>avg-propensity-to-consume</metric>
     <metric>real-GDP</metric>
-    <metric>average-market-price</metric>
+    <metric>fn-unemployment-rate</metric>
+    <metric>quarterly-inflation</metric>
+    <metric>yearly-inflation</metric>
+    <metric>gini-index</metric>
+    <metric>skewness-of-wealth-regular-worker</metric>
+    <metric>fn-wealth-of-regular-worker</metric>
+    <metric>wealth-of-regular-worker-to-gdp-ratio</metric>
+    <metric>households-consumption-to-gdp-ratio</metric>
+    <metric>avg-propensity-to-consume</metric>
+    <metric>avg-net-worth</metric>
+    <metric>skewness-of-networth</metric>
+    <metric>avg-firm-production</metric>
+    <metric>ln average-market-price</metric>
     <metric>avg-interest-rate</metric>
+    <metric>avg-wage-offered</metric>
+    <metric>inventory-to-gdp-ratio</metric>
+    <metric>patrimonial-bank-to-gdp-ratio</metric>
+    <metric>fn-wealth-of-extorters</metric>
+    <metric>avg-wealth-of-extorters-to-gdp-ratio</metric>
+    <metric>N-extorted-firms</metric>
+    <metric>N-punished-firms</metric>
+    <metric>N-extorters</metric>
+    <metric>N-extorters-in-jail</metric>
+    <metric>pizzo-to-gdp-ratio</metric>
+    <metric>punish-to-gdp-ratio</metric>
     <enumeratedValueSet variable="type-of-search">
       <value value="&quot;random-search&quot;"/>
     </enumeratedValueSet>
