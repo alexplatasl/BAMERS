@@ -164,6 +164,10 @@ to start-firms [#firms]
     set size 1.2
     set shape "factory"
   ]
+
+  ask firms [
+    move-to one-of patches with [not any? firms-here ]
+  ]
 end
 
 to start-workers [#workers]
@@ -687,6 +691,7 @@ to replace-bankrupt
       set x-position random-pxcor * 0.9
       set y-position random-pycor * 0.9
       setxy x-position y-position
+      move-to one-of patches with [not any? firms-here ]
       set color blue
       set size 1.2
       set shape "factory"
@@ -1050,11 +1055,11 @@ end
 GRAPHICS-WINDOW
 240
 10
-672
-443
+566
+325
 -1
 -1
-8.0
+6.0
 1
 8
 1
@@ -1066,13 +1071,13 @@ GRAPHICS-WINDOW
 1
 -26
 26
--26
-26
+-25
+25
 0
 0
 1
 ticks
-120.0
+240.0
 
 BUTTON
 26
@@ -1736,7 +1741,7 @@ PENS
 TEXTBOX
 241
 450
-661
+571
 476
 General extortion parameters
 12
