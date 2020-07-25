@@ -2314,103 +2314,109 @@ TEXTBOX
 1
 
 @#$#@#$#@
+The Bottom-up Adaptive Macroeconomics under Extortion Racket Systems (BAMERS) model extends the BAM model @DelliGatti2011 (NetLogo code by @Platas-Lopez2020 in https://www.comses.net/codebases/9dacc220-8d7f-4038-b618-92bb9b1333f0/) by introducing extortionists in the system. In what follows, the model is described in detail following the ODD protocol.
+
 Overview
 ========
 
 Purpose
 -------
 
-Modeling an economy with stable macro signals, that works as a benchmark for studying the effects of the agent activities, e.g. extortion, at the service of the elaboration of public policies.
+BAMERS is designed to explore the effect of individual extortion activities in macroeconomic signals like GDP, inflation, unemployment rate, and Gini index.
 
 Entities, state variables, and scales
 -------------------------------------
 
 -   Agents: Firms (also know as producers), workers (also know as consumers and households) and banks.
 
--   Environment: Virtual or geographically characterized markets.
+-   Environment: Originally the grid environment where the agents are situated was used exclusively for debug purposes, displaying information useful for validating the behavior of the system, e.g., the number of workers laboring in a firm, their presence when working and buying goods, etc. Beyond this, the BAMERS model uses neighborhood in this space when computing some decisions,   even when such relation has not geographical meaning, i.e., neighbors are not   assumed to be geographically closed.
 
-    -   Labor market.
+-   State variables: Firms and workers, as originally defined in the   BAM model, are now extended with the variables shown in  next Table for registering the effect of extortion   activities. Unemployed workers can become extortionists and keep a list of   firms to extort and possibly punish. When captured, an extortionist will be in   jail a given number of periods (`time-in-jail`). Firms register if they are   being extorted and keep.
 
-    -   Goods market
+<center>
+<table style="width: 400px; height: 50px;">
+<tbody>
+<tr class="odd">
+<td style="text-align: right;"><strong>Firm</strong></td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;"><strong>Worker</strong></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Attribute</strong></td>
+<td style="text-align: left;"><strong>Type</strong></td>
+<td style="text-align: left;"><strong>Attribute</strong></td>
+<td style="text-align: left;"><strong>Type</strong></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>being-extorted?</code></td>
+<td style="text-align: left;">Bool</td>
+<td style="text-align: left;"><code>extortionist?</code></td>
+<td style="text-align: left;">Bool</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>amount-of-pizzo</code></td>
+<td style="text-align: left;">Float</td>
+<td style="text-align: left;"><code>firms-to-extort</code></td>
+<td style="text-align: left;">AgSet</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>amount-of-punish</code></td>
+<td style="text-align: left;">Float</td>
+<td style="text-align: left;"><code>firms-to-punish</code></td>
+<td style="text-align: left;">AgSet</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"><code>time-in-jail</code></td>
+<td style="text-align: left;">Int</td>
+</tr>
+</tbody>
+</table>
+</center>
 
-    -   Credit market.
+-   Scales: Time is represented in discrete periods, each step   representing a month.
 
--   State variables: Productivity, net worth, wage and loans.
 
 Process overview and scheduling
 -------------------------------
 
-1.  Firms calculate production based on expected demand.
+Extortion in  the BAMERS model occurs after closing the goods market and before firms pay loans and dividends, i.e., in between steps 5 and 6 of the BAM model schedule. The new steps added to the schedule are as follows:
 
-2.  A decentralized labor market opens.
+<span>5.</span> A) Goods market opens. B) Good market closes.
+&nbsp;&nbsp;<span>E1.</span> Unemployed poor workers decide whether to become extortionists or not.
+&nbsp;&nbsp;<span>E2.</span> Extortionists look for firms to extort.
+&nbsp;&nbsp;<span>E3.</span> Firms pay the pizzo or refuse to pay and denounce.
+&nbsp;&nbsp;<span>E4.</span> Extortionists punish firms that refused to pay or, when captured, they     go to jail and lose their wealth.
+&nbsp;&nbsp;<span>E5.</span> Prisoners that have served their time in prison are released as regular     unemployed workers.
+<span>6.</span>  Firms will pay loans and dividends.
 
-3.  A decentralized credit market opens.
-
-4.  Firms produce.
-
-5.  Market for goods open.
-
-6.  Firms will pay loan and dividends.
-
-7.  Firms and banks will survive or die.
-
-8.  Replacing of bankrupt firms/banks.
 
 Design concepts
 ===============
 
 ### Basic Principles
 
-Neo classical economy.
+Economic pressure and socioeconomic status induce a process of decision making on how to respond to basic needs, even considering the idea of becoming criminals. @Abrahamsen1949 [p.140] wrote about this:
 
-### Emergence
-
-Model as a whole has the objective of generating adaptive behavior of the agents, without the imposition of an equation that governs the actions of the agents.
+> There are a few questions that are frequently asked in regard to our findings that family tension is the basic cause of criminal behavior.  The first has to do with economics. It is reasonable to assume,  intellectually speaking, that when one is without what is necessary  for subsistence and cannot get it, he will simply take it for himself  and his loved ones. This is instinctive, and it has to do with  self-preservation.
 
 ### Adaptation
 
-Firms can adapt in each period t price or amount to supply (only one of the two strategies). Adaptation of each strategy depends on the condition of the firm (level of excessive supply / demand in the previous period) and/or the market environment (the difference between the individual price and the market price in the previous period).
-
-### Objectives
-
-Just firms has the objetive of maximizing their net worth.
-
-### Learning
-
-Firms do not have learning, they present different responses to an environment that is constantly evolving.
-
-### Prediction
-
-Firms use both their own elements and the environment to make the prediction of the quantity to be produced or the price. As an internal element, it uses the excessive amount of supply / demand in the previous period; while the environment takes the differential of its price and the market.
+Following the basic principle enunciated above, every time the goods market closes, unemployed workers belonging to the poorest quartile in the population decide as to whether they will become extortionists or not with a propensity *ϵ*. The propensity to become a criminal is orthogonal to any other variable, e.g., the probability of being imprisoned *λ*. This enables a controlled complete parameter exploration to evaluate the macroeconomic effect of extortion. When *ϵ* is equal to zero, our model corresponds to the baseline macroeconomic model without extortion, i.e., the BAM model.
 
 ### Sensing
 
--   Firms are able to perceive their produced quantity, their price and the market price, offered wages, profits, net value, their labor force and interest rate of randomly chosen banks.
-
--   Workers/consumers perceive the size of firms visited in the previous period, prices published by the firms in actual period and wages offered by the firms.
-
--   Banks are able to sense net value of potential borrower (firms) in order to calculate interest rate.
+Firms can observe a given number of firms to know if they are paying for pizzo or not.
 
 ### Interaction
 
-Macroeconomic results come from continuous adaptive dispersed interactions of autonomous, heterogeneous and rationally bounded agents that coincide in an uncertain environment.
+Interaction happens when an extortionist finds a firm and asks for the payment of pizzo. Firms can in turn accept, or refuse to pay and denounce.
 
 ### Stochasticity
 
-Elements that have random shocks are:
-
--   Determination of wages (when vacancies are offered), `wages-shock-xi`.
-
--   Determination of contractual interest rate offered by banks to
-    firms, `interest-shock-phi`.
-
--   Strategy to set prices, `price-shock-eta`.
-
--   Strategy to determine the quantity to produce, `production-shock-rho`.
-
-### Collectives
-
-In addition to the sets of agents (consumers, producers and banks), groups of firms and consumers are selected as an emergent property of the simulation (rich and poor).
+Processes exhibiting randomness include becoming an extortionist, being imprisoned, and trying to extort a firm. The search for potential firms to extort is also stochastic.
 
 ### Observation
 
@@ -2434,222 +2440,108 @@ Details
 Initialization
 --------------
 
-<table class="tg">
-  <tr>
-    <th class="tg-0pky">Parameter</th>
-    <th class="tg-0pky">Parameter</th>
-    <th class="tg-0pky">Value</th>
-  </tr>
-  <tr>
-    <td class="tg-0pky">I</td>
-    <td class="tg-0pky">Consumers</td>
-    <td class="tg-0pky">500</td>
-  </tr>
-  <tr>
-    <td class="tg-0pky">J</td>
-    <td class="tg-0pky">Producers</td>
-    <td class="tg-0pky">100</td>
-  </tr>
-  <tr>
-    <td class="tg-0pky">K</td>
-    <td class="tg-0pky">Banks</td>
-    <td class="tg-0pky">10</td>
-  </tr>
-  <tr>
-    <td class="tg-0pky">T</td>
-    <td class="tg-0pky">Periods</td>
-    <td class="tg-0pky">1000</td>
-  </tr>
-  <tr>
-    <td class="tg-0pky">C<sub>P</sub></td>
-    <td class="tg-0pky">Propensity to consume of poorest people</td>
-    <td class="tg-0pky">1</td>
-  </tr>
-  <tr>
-    <td class="tg-0pky">C<sub>R</sub></td>
-    <td class="tg-0pky">Propensity to consume of richest people</td>
-    <td class="tg-0pky">0.5</td>
-  </tr>
-  <tr>
-    <td class="tg-0pky">h<sub>&xi</sub></td>
-    <td class="tg-0pky">Maximum growth rate of wages</td>
-    <td class="tg-0pky">0.05</td>
-  </tr>
-  <tr>
-    <td class="tg-0pky">H<sub>&eta</sub></td>
-    <td class="tg-0pky">Maximum growth rate of prices</td>
-    <td class="tg-0pky">0.1</td>
-  </tr>
-  <tr>
-    <td class="tg-0pky">H<sub>&rho</sub></td>
-    <td class="tg-0pky">Maximum growth rate of quantities</td>
-    <td class="tg-0pky">0.1</td>
-  </tr>
-  <tr>
-    <td class="tg-0pky">H<sub>&phi</sub></td>
-    <td class="tg-0pky">Maximum amount of banks’ costs</td>
-    <td class="tg-0pky">0.1</td>
-  </tr>
-  <tr>
-    <td class="tg-0pky">Z</td>
-    <td class="tg-0pky">Number of trials in the goods market</td>
-    <td class="tg-0pky">2</td>
-  </tr>
-  <tr>
-    <td class="tg-0pky">M</td>
-    <td class="tg-0pky">Number of trials in the labor market</td>
-    <td class="tg-0pky">4</td>
-  </tr>
-  <tr>
-    <td class="tg-0pky">H</td>
-    <td class="tg-0pky">Number of trials in the credit market</td>
-    <td class="tg-0pky">2</td>
-  </tr>
-  <tr>
-    <td class="tg-0pky">w&#770</td>
-    <td class="tg-0pky">Minimum wage (set by a mandatory law)</td>
-    <td class="tg-0pky">1</td>
-  </tr>
-  <tr>
-    <td class="tg-0pky">P<sub>t<sub></td>
-    <td class="tg-0pky">Base price</td>
-    <td class="tg-0pky">1</td>
-  </tr>
-  <tr>
-    <td class="tg-0pky">&delta</td>
-    <td class="tg-0pky">Fixed fraction to share dividends</td>
-    <td class="tg-0pky">0.15</td>
-  </tr>
-  <tr>
-    <td class="tg-0pky">r&#772</td>
-    <td class="tg-0pky">Interest rate (set by the central monetary authority)</td>
-    <td class="tg-0pky">0.07</td>
-  </tr>
+Next Table shows the default parameter initialization for the BAMERS model. Parameter values are influenced by the work of  [@elsenbroich2016; @Troitzsch2015a; @Nardin2016a; @Nardin2017]. Their use is fully described below, in the submodels section.
+
+<center>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><strong>Parameter</strong></th>
+<th style="text-align: left;"></th>
+<th style="text-align: right;"><strong>Value</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">&epsilon;</span></td>
+<td style="text-align: left;">Propensity to become an extortionist</td>
+<td style="text-align: right;">20%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">&lambda;</span></td>
+<td style="text-align: left;">Probability of being imprisoned</td>
+<td style="text-align: right;">30%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">R<sub>t</sub></span></td>
+<td style="text-align: left;">Rejection threshold</td>
+<td style="text-align: right;">15%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">X</span></td>
+<td style="text-align: left;">Number of attempts to extort a new firm</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">CF</span></td>
+<td style="text-align: left;">Number of observable closest firms</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">P<sub>i</sub></span></td>
+<td style="text-align: left;">Proportion of net worth asked as pizzo</td>
+<td style="text-align: right;">20%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">P<sub>u</sub></span></td>
+<td style="text-align: left;">Proportion of net worth taken as punish</td>
+<td style="text-align: right;">30%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">C<sub>m</sub></span></td>
+<td style="text-align: left;">Proportion of wealth as confiscated money</td>
+<td style="text-align: right;">50%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">T<sub>j</sub></span></td>
+<td style="text-align: left;">Number of time periods in jail</td>
+<td style="text-align: right;">6</td>
+</tr>
+</tbody>
 </table>
-
-Input data
-----------
-
-No input data were needed to represent process.
+</center>
 
 Submodels
 ---------
 
-1.  Production with constant returns to scale and technological multiplier. 
-	Y<sub>it</sub> = &alpha;<sub>it</sub> L<sub>it</sub>, &alpha;<sub>it</sub> > 0.
+1.  The number of extortionists in the system can change every time step. Each unemployed worker in the quartile with the lower savings become a criminal if the propensity to be an extortionist *ϵ* is greater than a randomly generated value with a uniform distribution between 0 and 100.
 
-2.  Desired production level Y<sub>it</sub><sup>d</sup> is equal to the expected demand 	D<sub>it</sub><sup>d</sup>.
+2.  An extortionist has *X* attempts to find a new victim. If an extortionist selects a firm that is already being extorted, it is considered as a failed attempt.
 
-3.  Desired labor force (employees) L<sub>it</sub><sup>d</sup> is L<sub>it</sub><sup>d</sup> = Y<sub>it</sub><sup>d</sup> &frasl; &alpha;<sub>it</sub>
+3.  Extortionists choose their victims by searching randomly over all firms. 
 
-4.  Current number of employees L<sub>it</sub><sup>0</sup> is the sum of employees     with and without a valid contract.
+4.  Firms can allow the extortion or refuse to pay. A firm refuses to pay the pizzo when the rejection threshold (*R*<sub>*t*</sub>) is greater than the expected risk (*ER*), which is calculated as follows:
 
-5.  Number of vacancies offered by firms V<sub>it</sub> is V<sub>it</sub> = max (L<sub>it</sub><sup>d</sup> - L<sub>it</sub><sup>0</sup>, 0).
+    *ER = EF / CF*
 
-6.  w&#770;<sub>t</sub> is the minimum wage determined by law.
+    where, *CF* denotes number of observable firms (three by default), i.e., the closest ones; and *EF* denotes how many of them are being extorted. This cognitive mechanism is based on the work of @elsenbroich2016. *R*<sub>*t*</sub> = 0 makes firms to pay the pizzo at the slightest hint of extortion activity.
 
-7.  If there are no vacancies V<sub>it</sub> = 0, wage offered is:
-    w<sub>it</sub><sup>b</sup> = max (w&#770;<sub>t</sub>, w<sub>it-1</sub>),
+5.  Firms that accept to pay the pizzo are asked for a proportion of their net worth, set by default to *P*<sub>*i*</sub> = 20% as suggested by [@Troitzsch2015a; @Nardin2016a; @Nardin2017].
 
-8.  If number of vacancies is greater than 0, wage offered is:
-    w<sub>it</sub><sup>b</sup> = max (w&#770;<sub>t</sub>, w<sub>it-1</sub> (1+ &xi;<sub>it</sub>)),
+6.  Firms that refuse to pay the pizzo always denounce. The probability that a extortionist is imprisoned is set to *λ* = 30%. Imprisoned extortionists stay *T*<sub>*j*</sub> = 6 periods in jail. Additionally, a proportion *C*<sub>*m*</sub> = 50% of their wealth is confiscated for supporting the victims of extortion that had denounced. All the previous default parameter values were adopted from the findings by [@Troitzsch2015a; @Nardin2016a; @Nardin2017].
 
-9.  &xi;<sub>it</sub> is a random term evenly distributed between (0, h<sub>&xi;</sub>).
+7.  Extortionists that are not imprisoned punish the firm that denounced them, if any. The amount of money taken as punishment is a proportion of the net worth of the firm set by default to *P*<sub>*u*</sub> = 30%.
 
-10. At the beginning of each period, a firm has a net value A<sub>it</sub>. If total payroll to be paid W<sub>it</sub> is greater than A<sub>it</sub>, firm asks for a B<sub>it</sub> loan:
-    B<sub>it</sub> = max (W<sub>it</sub> - A<sub>it</sub>, 0 )
+8.  Firms who have denounced and being punished receive an equal proportion of the victim support fund raised from 50% of imprisoned extortionists wealth. 
 
-11. For the loan search costs, it must be met that H < K.
-
-12. In each period the <i>k</i>-th most bank can distribute a total amount of credit C<sub>k</sub> equivalent to a multiple of its patrimonial base:
-    C<sub>kt</sub> = E<sub>kt</sub> &frasl; v,
-
-13. where 0 < <i>v</i> < 1 can be interpreted as the capital requirement coefficient. Therefore, the <i>v</i> reciprocal represents the maximum allowed leverage by the bank.
-
-14. Bank offers credit C<sub>k</sub>, with its respective interest rate r<sub>it</sub><sup>k</sup> and contract for 1 period.
-
-15. Payment scheme if A<sub>it + 1</sub> > 0: B<sub>it</sub> (1 + r<sub>it</sub><sup>k</sup>).
-
-16. If A<sub>it + 1</sub> &#8804; 0 , bank retrieves R<sub>it + 1</sub>.
-
-17. Contractual interest rate offered by the bank k to the firm i is determined as a margin on a rate policy established by Central Monetary Authority r&#772;:
-    R<sub>it</sub><sup>k</sup> = r&#772; (1 + &phi;<sub>kt</sub> &mu;(&ell;<sub>it</sub>)).
-
-18. Margin is a function of the specificity of the bank as possible variations in its operating costs and captured by the uniform random variable &phi;<sub>kt</sub> in the interval (0, h<sub>&phi;</sub>).
-
-19. Margin is also a function of the borrower’s financial fragility, captured by the term
-	&mu; (&ell;<sub>it</sub>), &mu;<sup>'</sup>} > 0. Where &ell;<sub>it</sub> = B<sub>it</sub> &frasl;A<sub>it</sub> is the leverage of borrower.
-
-20. Demand for credit is divisible, that is, if a single bank is not able to satisfy the requested credit, it can request in the remaining H-1 randomly selected banks.
-
-21. Each firm has an inventory of unsold goods S<sub>it</sub>, where excess supply  S<sub>it</sub> > 0 or demand S<sub>it</sub> = 0 is reflected.
-
-22. Deviation of the individual price from the average market price during the previous period is represented as:
-    P<sub>it-1</sub> - P<sub>t-1</sub>
-
-23. If deviation is positive, P<sub>it-1</sub> > P<sub>t-1</sub>, firm recognizes that its price is high compared to its competitors, and is induced to decrease the price or quantity to prevent a migration massive in favor of its rivals.
-
-24. Vice versa.
-
-25. In case of adjusting price to downside, this is bounded below P<sub>it</sub><sup>l</sup> to not be less than your average costs
-    P<sub>it</sub><sup>l</sup> = &#91; W<sub>it</sub> + &Sigma;<sub>k</sub> r<sub>kit</sub> B<sub>kit</sub> &#93; &frasl; Y<sub>it</sub>.
-
-26. Aggregate price P<sub>t</sub> is common knowledge (global variable), while inventory S<sub>it</sub> and individual price P<sub>it</sub> private knowledge child (local variables).
-
-27. Only the price or quantity to be produced can be modified. In the case of price, we have the following rule for P<sub>it</sub><sup>s</sup>:
-max[P<sub>it</sub><sup>l</sup>, P<sub>it-1</sub>(1+&eta;<sub>it</sub>)]  &nbsp;&nbsp;&nbsp;    if &nbsp;&nbsp;&nbsp; S<sub>it-1</sub>=0 and P<sub>it-1</sub><P
-max[P<sub>it</sub><sup>l</sup>, P<sub>it-1</sub>(1-&eta;<sub>it</sub>)] &nbsp;&nbsp;&nbsp;    if &nbsp;&nbsp;&nbsp; S<sub>it-1</sub>>0 and P<sub>it-1</sub>&#8805; P
-
-28. &eta;<sub>it</sub> is a randomized term uniformly distributed in the range (0, h<sub> &eta;</sub>) and P<sub>it</sub><sup>l</sup> is the minimum price at which firm i can solve its minimal costs at time t (previously defined).
-
-29. In the case of quantities, these are adjusted adaptively according to the following rule for D<sub>it</sub><sup>e</sup> :
-Y<sub>it-1</sub>(1+&rho;<sub>it</sub>) &nbsp;&nbsp;&nbsp; if &nbsp;&nbsp;&nbsp; S<sub>it-1</sub>=0 and P<sub>it-1</sub>&#8805; P
-Y<sub>it-1</sub>(1-&rho;<sub>it</sub>) &nbsp;&nbsp;&nbsp; if &nbsp;&nbsp;&nbsp; S<sub>it-1</sub>>0 and P<sub>it-1</sub>< P
-
-30. &rho;<sub>it</sub> is a random term uniform distributed and bounded between (0, h<sub>&rho;</sub>).
-
-31. Total income of households (workers/consumers) is the sum of the payroll paid to the workers (each household represents a worker) in t and the dividends distributed to the shareholders in t-1.
-
-32. Wealth is defined as the sum of labor income plus the sum of all savings SA of the past.
-
-33. Marginal propensity to consume c is a decreasing function of the worker’s total wealth (higher the wealth lower the proportion spent on consumption) defined as:
-
-    c<sub>jt</sub> = 1 &frasl; [ 1 + tanh (SA<sub>jt</sub> &frasl;SA<sub>t</sub>)]<sup>&beta;</sup>
-
-34. SA<sub>t</sub> is the average savings. SA<sub>jt</sub> is the real saving of the j -th consumer.
-
-35. The revenue R<sub>it</sub> of a firm after the goods market closes is equal to:
-
-    R<sub>it</sub> = P<sub>it</sub> Y<sub>it</sub>
-
-36. At the end of t period, each firm computes benefits &pi;<sub>it-1</sub>.
-
-37. If the benefits are positive, the shareholders of firms receive dividends:
-
-    Div<sub>it-1</sub> = &delta; &pi;<sub>it-1</sub>
-
-38. Residual, after discounting dividends, is added to net value inherited from previous period, A<sub>it-1</sub>. Therefore, net worth of a profitable firm in t is:
-
-    A<sub>it</sub> = A<sub>it-1</sub>+&pi;<sub>it-1</sub> -Div<sub>it-1</sub> &equiv; A<sub>it-1</sub>+ (1-&delta;)&pi;<sub>it-1</sub>
-
-39. If firm, say f, accumulates a net value A<sub>it</sub> < 0 goes bankrupt.
-
-40. Firm that goes bankrupt is replaced with another one of smaller size than the average of incumbent firms.
-
-41. Non-incumbent firms are those whose size is above and below 5%, is used to calculate a more robust estimator of the average.
-
-42. Bank’s capital
-
-    E<sub>kt</sub>=E<sub>kt-1</sub> + &Sigma;<sub>i &isin; &Theta;</sub> r<sub>kit-1</sub> B<sub>kit-1</sub> - BD<sub>kt-1</sub>
-
-43. &Theta; is the bank’s loan portfolio, BD<sub>kt-1</sub> represents the portfolio of firms that go bankrupt.
-
-44. If a bank goes bankrupt, it is replaced with a copy of the surviving banks.
+9.  Extortionists who served their sentence become regular workers in the labor market, in the immediate following period.
 
 
-Reference
+References
 ========
-Delli Gatti, D. et. al, (2011). *Macroeconomics from the Bottom-up*. Springer-Verlag Mailand, Milan.
+Abrahamsen, D. (1949). Family tension, basic cause of criminal behavior. *Journal of Criminal Law and Criminology (1931-1951)*, *40*(3), 330--343 <http://www.jstor.org/stable/1138546>
+
+Delli Gatti, D., Desiderio, S., Gaffeo, E., Cirillo, P. & Gallegati, M. (2011). *Macroeconomics from the bottom-up*, vol. 11. Springer. <http://dx.doi.org/10.1007/978-88-470-1971-3>
+
+Elsenbroich, C. & Badham, J. (2016). The extortion relationship: A computational analysis. *Journal of Artificial Societies and Social Simulation*, *19*. <http://dx.doi.org/10.18564/jasss.3223>
+
+Platas-López, A., Guerra-Hernández, A., Cruz-Ramı́rez, N., Quiroz-Castellanos, M., Grimaldo, F., Paolucci, M. & Cecconi, F. (2020). Towards an agent-based model for the analysis of macroeconomic signals. In *Intuitionistic and Type-2 Fuzzy Logic Enhancements in Neural and Optimization Algorithms: Theory and Applications*, (pp. 551–565). Springer International Publishing. <http://dx.doi.org/10.1007/978-3-030-35445-9_38>
+
+Troitzsch, K. G. (2014). Distribution effects of extortion racket systems. In *Lecture Notes in Economics and Mathematical Systems*, (pp. 181--193). Springer International Publishing. <http://dx.doi.org/10.1007/978-3-319-09578-3_15>
+
+Nardin, L. G., Andrighetto, G., Conte, R., Székely, Á., Anzola, D., Elsenbroich, C., Lotzmann, U., Neumann, M., Punzo, V. & Troitzsch, K. G. (2016). Simulating protection rackets: a case study of the sicilian mafia. *Autonomous Agents and Multi-Agent Systems*, *30*(6), 1117--1147. <http://dx.doi.org/10.1007/s10458-016-9330-z>
+
+Nardin, L. G., Székely, Á. & Andrighetto, G. (2017). GLODERS-S: a simulator for agent-based models of criminal organisations. *Trends in Organized Crime*, *20*(1), 85--99. <http://dx.doi.org/10.1007/s12117-016-9287-y>
 @#$#@#$#@
 default
 true
